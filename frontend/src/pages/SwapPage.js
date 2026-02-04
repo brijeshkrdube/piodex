@@ -263,31 +263,43 @@ const SwapPage = () => {
               )}
             </div>
             <div className="flex items-center gap-3">
-              <input
-                type="number"
-                value={calculatedBuyAmount}
-                readOnly
-                placeholder="0"
-                className="flex-1 bg-transparent text-3xl font-medium text-white placeholder:text-gray-600 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              />
+              <div className="flex-1 flex items-center">
+                {isLoadingQuote ? (
+                  <Loader2 className="w-6 h-6 text-gray-500 animate-spin" />
+                ) : (
+                  <input
+                    type="number"
+                    value={buyAmount}
+                    readOnly
+                    placeholder="0"
+                    className="w-full bg-transparent text-3xl font-medium text-white placeholder:text-gray-600 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
+                )}
+              </div>
               <button
                 onClick={() => setShowBuySelector(true)}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 transition-all"
               >
-                <img src={buyToken?.logo} alt={buyToken?.symbol} className="w-6 h-6 rounded-full" />
-                <span className="font-semibold text-white">{buyToken?.symbol}</span>
+                {buyToken ? (
+                  <>
+                    <img src={buyToken.logo} alt={buyToken.symbol} className="w-6 h-6 rounded-full" />
+                    <span className="font-semibold text-white">{buyToken.symbol}</span>
+                  </>
+                ) : (
+                  <span className="text-gray-400">Select</span>
+                )}
                 <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
             </div>
-            {calculatedBuyAmount && (
+            {buyAmount && (
               <div className="mt-2 text-sm text-gray-500">
-                ~${(parseFloat(calculatedBuyAmount) * buyToken?.price || 0).toFixed(2)}
+                ~${(parseFloat(buyAmount) * (buyToken?.price || 0)).toFixed(2)}
               </div>
             )}
           </div>
 
           {/* Exchange Rate Info */}
-          {sellAmount && calculatedBuyAmount && (
+          {sellAmount && buyAmount && (
             <div className="mt-4 p-3 rounded-xl bg-white/5 space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-400">Rate</span>
