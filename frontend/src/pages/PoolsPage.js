@@ -303,51 +303,141 @@ const PoolsPage = () => {
 
       {/* Create Pool Modal */}
       <Dialog open={showCreatePool} onOpenChange={setShowCreatePool}>
-        <DialogContent className="bg-[#1a1a1a] border-white/10 text-white sm:max-w-lg">
+        <DialogContent className="bg-[#1a1a1a] border-white/10 text-white sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Create New Pool</DialogTitle>
             <DialogDescription className="text-gray-400">
-              Select a pair of tokens and fee tier to create a new liquidity pool
+              Select a pair of tokens, fee tier, and add initial liquidity
             </DialogDescription>
           </DialogHeader>
 
-          {!isConnected ? (
-            <div className="py-8 text-center">
-              <Wallet className="w-12 h-12 mx-auto mb-4 text-gray-500" />
-              <p className="text-gray-400 mb-4">Connect your wallet to create a pool</p>
-              <Button
-                onClick={connectWallet}
-                disabled={isConnecting}
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-xl"
-              >
-                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-6 mt-4">
-              {/* Token Selection */}
-              <div className="space-y-3">
-                <label className="text-sm text-gray-400">Select Pair</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setShowToken0Selector(true)}
-                    className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
-                  >
-                    {token0 ? (
-                      <>
-                        <img src={token0.logo} alt={token0.symbol} className="w-8 h-8 rounded-full" />
-                        <span className="font-semibold">{token0.symbol}</span>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-8 h-8 rounded-full bg-white/10" />
-                        <span className="text-gray-500">Select token</span>
-                      </>
-                    )}
-                    <ChevronDown className="w-4 h-4 text-gray-400 ml-auto" />
-                  </button>
+          <div className="space-y-6 mt-4">
+            {/* Token Selection */}
+            <div className="space-y-3">
+              <label className="text-sm text-gray-400">Select Pair</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => setShowToken0Selector(true)}
+                  className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+                >
+                  {token0 ? (
+                    <>
+                      <img src={token0.logo} alt={token0.symbol} className="w-8 h-8 rounded-full" />
+                      <span className="font-semibold">{token0.symbol}</span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-8 h-8 rounded-full bg-white/10" />
+                      <span className="text-gray-500">Select token</span>
+                    </>
+                  )}
+                  <ChevronDown className="w-4 h-4 text-gray-400 ml-auto" />
+                </button>
 
+                <button
+                  onClick={() => setShowToken1Selector(true)}
+                  className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+                >
+                  {token1 ? (
+                    <>
+                      <img src={token1.logo} alt={token1.symbol} className="w-8 h-8 rounded-full" />
+                      <span className="font-semibold">{token1.symbol}</span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-8 h-8 rounded-full bg-white/10" />
+                      <span className="text-gray-500">Select token</span>
+                    </>
+                  )}
+                  <ChevronDown className="w-4 h-4 text-gray-400 ml-auto" />
+                </button>
+              </div>
+            </div>
+
+            {/* Fee Tier Selection */}
+            <div className="space-y-3">
+              <label className="text-sm text-gray-400">Select Fee Tier</label>
+              <div className="grid grid-cols-2 gap-3">
+                {FEE_TIERS.map((tier) => (
                   <button
+                    key={tier.value}
+                    onClick={() => setSelectedFee(tier)}
+                    className={`p-4 rounded-xl border transition-all text-left ${
+                      selectedFee.value === tier.value
+                        ? 'bg-amber-500/10 border-amber-500/50'
+                        : 'bg-white/5 border-white/10 hover:bg-white/10'
+                    }`}
+                  >
+                    <div className="font-semibold text-white">{tier.label}</div>
+                    <div className="text-xs text-gray-500 mt-1">{tier.description}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Initial Liquidity */}
+            {token0 && token1 && (
+              <div className="space-y-3">
+                <label className="text-sm text-gray-400">Add Initial Liquidity</label>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5">
+                    <img src={token0.logo} alt={token0.symbol} className="w-6 h-6 rounded-full" />
+                    <span className="text-gray-400 w-16">{token0.symbol}</span>
+                    <input
+                      type="number"
+                      value={amount0}
+                      onChange={(e) => setAmount0(e.target.value)}
+                      placeholder="0.0"
+                      className="flex-1 bg-transparent text-white text-right focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5">
+                    <img src={token1.logo} alt={token1.symbol} className="w-6 h-6 rounded-full" />
+                    <span className="text-gray-400 w-16">{token1.symbol}</span>
+                    <input
+                      type="number"
+                      value={amount1}
+                      onChange={(e) => setAmount1(e.target.value)}
+                      placeholder="0.0"
+                      className="flex-1 bg-transparent text-white text-right focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500">
+                  Initial liquidity determines the starting price ratio
+                </p>
+              </div>
+            )}
+
+            {/* Warning about no smart contract */}
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-amber-200">
+                  <strong>Note:</strong> This creates a pool in the PioSwap database. For real on-chain liquidity, smart contracts need to be deployed on PIOGOLD network.
+                </div>
+              </div>
+            </div>
+
+            {/* Create Button */}
+            <Button
+              onClick={handleCreatePool}
+              disabled={!token0 || !token1 || isCreating || createSuccess}
+              className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl disabled:opacity-50"
+            >
+              {createSuccess ? (
+                <><Check className="w-5 h-5 mr-2" /> Pool Created!</>
+              ) : isCreating ? (
+                <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Creating Pool...</>
+              ) : !token0 || !token1 ? (
+                'Select both tokens'
+              ) : (
+                'Create Pool'
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
                     onClick={() => setShowToken1Selector(true)}
                     className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
                   >
