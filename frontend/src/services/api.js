@@ -72,11 +72,13 @@ export const getPool = async (poolId) => {
   };
 };
 
-export const createPool = async (token0Address, token1Address, fee) => {
+export const createPool = async (token0Address, token1Address, fee, amount0 = 0, amount1 = 0) => {
   const response = await apiClient.post('/pools', {
     token0_address: token0Address,
     token1_address: token1Address,
-    fee
+    fee,
+    amount0,
+    amount1
   });
   return response.data;
 };
