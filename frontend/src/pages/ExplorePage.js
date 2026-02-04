@@ -334,7 +334,7 @@ const ExplorePage = () => {
             Trending on PioSwap
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {TOKENS.slice(0, 4).map((token, index) => (
+            {tokens.slice(0, 4).map((token, index) => (
               <Card
                 key={token.id}
                 className="bg-[#1a1a1a] border-white/5 p-4 rounded-2xl hover:bg-white/5 transition-colors group"
@@ -361,7 +361,7 @@ const ExplorePage = () => {
                       variant="ghost"
                       className="opacity-0 group-hover:opacity-100 text-amber-400 hover:text-amber-300 transition-all"
                     >
-                      Trade <ExternalLink className="w-3 h-3 ml-1" />
+                      Trade <ArrowUpRight className="w-3 h-3 ml-1" />
                     </Button>
                   </Link>
                 </div>
