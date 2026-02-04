@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { TOKENS, formatNumber } from '../data/mock';
 import TokenSelector from '../components/TokenSelector';
