@@ -97,7 +97,13 @@ const PoolsPage = () => {
     
     setIsCreating(true);
     try {
-      await createPoolAPI(token0.address, token1.address, selectedFee.value);
+      await createPoolAPI(
+        token0.address, 
+        token1.address, 
+        selectedFee.value,
+        parseFloat(amount0) || 0,
+        parseFloat(amount1) || 0
+      );
       setCreateSuccess(true);
       
       // Refresh pools list
@@ -109,9 +115,13 @@ const PoolsPage = () => {
         setCreateSuccess(false);
         setToken0(null);
         setToken1(null);
+        setAmount0('');
+        setAmount1('');
       }, 2000);
     } catch (error) {
       console.error('Error creating pool:', error);
+      alert(error.response?.data?.detail || 'Failed to create pool');
+    }
     }
     setIsCreating(false);
   };
