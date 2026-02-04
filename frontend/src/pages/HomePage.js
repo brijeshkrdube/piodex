@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useWallet } from '../context/WalletContext';
-import { TOKENS, PROTOCOL_STATS } from '../data/mock';
+import { formatCurrency } from '../data/mock';
+import { getTokens, getStats } from '../services/api';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import {
   ArrowRight,
-  Wallet,
   ArrowLeftRight,
   Droplets,
   BarChart3,
@@ -14,11 +14,41 @@ import {
   Zap,
   Globe,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from 'lucide-react';
 
 const HomePage = () => {
   const { isConnected, connectWallet, isConnecting } = useWallet();
+  const [tokens, setTokens] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [fetchedTokens, fetchedStats] = await Promise.all([
+          getTokens(),
+          getStats()
+        ]);
+        setTokens(fetchedTokens);
+        setStats(fetchedStats);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+      setLoading(false);
+    };
+    loadData();
+  }, []);
+
+  // Format large numbers
+  const formatStatNumber = (num) => {
+    if (num >= 1e12) return `${(num / 1e12).toFixed(1)}T`;
+    if (num >= 1e9) return `${(num / 1e9).toFixed(1)}B`;
+    if (num >= 1e6) return `${(num / 1e6).toFixed(1)}M`;
+    if (num >= 1e3) return `${(num / 1e3).toFixed(1)}K`;
+    return num.toString();
+  };
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] relative overflow-hidden">
@@ -31,7 +61,7 @@ const HomePage = () => {
       {/* Animated Token Ticker */}
       <div className="relative z-10 border-b border-white/5 bg-black/30 backdrop-blur-sm overflow-hidden">
         <div className="flex animate-scroll gap-8 py-3 px-4">
-          {[...TOKENS, ...TOKENS].map((token, i) => (
+          {[...tokens, ...tokens].map((token, i) => (
             <div key={`${token.id}-${i}`} className="flex items-center gap-2 whitespace-nowrap">
               <img src={token.logo} alt={token.symbol} className="w-5 h-5 rounded-full" />
               <span className="text-white font-medium">{token.symbol}</span>
