@@ -33,13 +33,12 @@ const SwapPage = () => {
   const [sellToken, setSellToken] = useState(TOKENS[0]); // PIO
   const [buyToken, setBuyToken] = useState(TOKENS[2]); // USDT
   const [sellAmount, setSellAmount] = useState('');
-  const [buyAmount, setBuyAmount] = useState('');
   const [showSellSelector, setShowSellSelector] = useState(false);
   const [showBuySelector, setShowBuySelector] = useState(false);
   const [slippage, setSlippage] = useState(0.5);
   const [isSwapping, setIsSwapping] = useState(false);
   const [swapSuccess, setSwapSuccess] = useState(false);
-  const [priceImpact, setPriceImpact] = useState(0.12);
+  const [priceImpact] = useState(0.12);
   
   // Calculate exchange rate
   const exchangeRate = sellToken && buyToken 
