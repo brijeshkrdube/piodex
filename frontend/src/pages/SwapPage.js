@@ -82,7 +82,6 @@ const SwapPage = () => {
     setTimeout(() => {
       setSwapSuccess(false);
       setSellAmount('');
-      setBuyAmount('');
     }, 3000);
   };
 
