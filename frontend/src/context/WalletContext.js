@@ -32,8 +32,7 @@ export const WalletProvider = ({ children }) => {
       }
     };
     checkConnection();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [connectWallet]);
 
   // Listen for wallet events
   useEffect(() => {
