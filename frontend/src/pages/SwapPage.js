@@ -559,14 +559,38 @@ const SwapPage = () => {
                     <AlertTriangle className="w-5 h-5 mr-2" />
                     Insufficient {sellToken?.symbol} balance
                   </Button>
-                ) : swapSuccess ? (
+                ) : needsApproval ? (
                   <Button
-                    disabled
-                    className="w-full py-6 text-lg font-semibold bg-green-500 text-white rounded-xl"
+                    onClick={handleApprove}
+                    disabled={isApproving}
+                    className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl"
                   >
-                    <Check className="w-5 h-5 mr-2" />
-                    Swap Successful!
+                    {isApproving ? (
+                      <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Approving...</>
+                    ) : (
+                      <>Approve {sellToken?.symbol}</>
+                    )}
                   </Button>
+                ) : swapSuccess ? (
+                  <div className="space-y-2">
+                    <Button
+                      disabled
+                      className="w-full py-6 text-lg font-semibold bg-green-500 text-white rounded-xl"
+                    >
+                      <Check className="w-5 h-5 mr-2" />
+                      Swap Successful!
+                    </Button>
+                    {txHash && (
+                      <a 
+                        href={`https://pioscan.com/tx/${txHash}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block text-center text-sm text-amber-400 hover:text-amber-300"
+                      >
+                        View on Explorer →
+                      </a>
+                    )}
+                  </div>
                 ) : (
                   <Button
                     onClick={handleSwap}
