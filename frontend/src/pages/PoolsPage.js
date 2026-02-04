@@ -122,7 +122,6 @@ const PoolsPage = () => {
       console.error('Error creating pool:', error);
       alert(error.response?.data?.detail || 'Failed to create pool');
     }
-    }
     setIsCreating(false);
   };
 
