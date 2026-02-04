@@ -54,10 +54,13 @@ const PoolsPage = () => {
   // Handle redirect from TokenSelector with custom token
   useEffect(() => {
     if (location.state?.createPoolWith && location.state?.autoOpenCreate) {
-      setToken0(location.state.createPoolWith);
-      setShowCreatePool(true);
-      // Clear location state
-      window.history.replaceState({}, document.title);
+      // Use timeout to avoid synchronous setState
+      const timer = setTimeout(() => {
+        setToken0(location.state.createPoolWith);
+        setShowCreatePool(true);
+        window.history.replaceState({}, document.title);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [location.state]);
 
