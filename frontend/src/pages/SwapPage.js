@@ -143,12 +143,102 @@ const SwapPage = () => {
     }
   };
 
+  // Check if approval is needed for the sell token
+  const checkApproval = useCallback(async () => {
+    if (!isConnected || !sellToken || !sellAmount || parseFloat(sellAmount) <= 0) {
+      setNeedsApproval(false);
+      return;
+    }
+
+    // Native token (PIO) doesn't need approval
+    if (sellToken.isNative || sellToken.address === '0x0000000000000000000000000000000000000000') {
+      setNeedsApproval(false);
+      return;
+    }
+
+    try {
+      const allowance = await web3Service.checkAllowance(
+        sellToken.address,
+        CONTRACT_ADDRESSES.ROUTER,
+        address
+      );
+      const sellAmountNum = parseFloat(sellAmount);
+      setNeedsApproval(parseFloat(allowance) < sellAmountNum);
+    } catch (error) {
+      console.error('Error checking allowance:', error);
+      setNeedsApproval(true);
+    }
+  }, [isConnected, sellToken, sellAmount, address]);
+
+  useEffect(() => {
+    checkApproval();
+  }, [checkApproval]);
+
+  const handleApprove = async () => {
+    if (!sellToken) return;
+    
+    setIsApproving(true);
+    try {
+      await web3Service.approveTokenMax(sellToken.address, CONTRACT_ADDRESSES.ROUTER);
+      setNeedsApproval(false);
+    } catch (error) {
+      console.error('Approval failed:', error);
+      alert('Approval failed: ' + error.message);
+    }
+    setIsApproving(false);
+  };
+
   const handleSwap = async () => {
     if (!isConnected || !sellAmount || parseFloat(sellAmount) <= 0) return;
     
     setIsSwapping(true);
+    setTxHash(null);
     
     try {
+      // Determine the swap path
+      const sellAddr = sellToken.isNative ? CONTRACT_ADDRESSES.WPIO : sellToken.address;
+      const buyAddr = buyToken.isNative ? CONTRACT_ADDRESSES.WPIO : buyToken.address;
+      
+      // Get decimals for amount conversion
+      const sellDecimals = sellToken.decimals || 18;
+      const buyDecimals = buyToken.decimals || 18;
+      
+      const amountIn = ethers.utils.parseUnits(sellAmount, sellDecimals);
+      const minAmountOut = ethers.utils.parseUnits(
+        (parseFloat(buyAmount) * (1 - slippage / 100)).toFixed(buyDecimals),
+        buyDecimals
+      );
+      
+      let result;
+      
+      if (sellToken.isNative) {
+        // Swap PIO for tokens
+        result = await web3Service.swapExactETHForTokens(
+          minAmountOut,
+          [CONTRACT_ADDRESSES.WPIO, buyAddr],
+          amountIn
+        );
+      } else if (buyToken.isNative) {
+        // Swap tokens for PIO
+        result = await web3Service.swapExactTokensForETH(
+          amountIn,
+          minAmountOut,
+          [sellAddr, CONTRACT_ADDRESSES.WPIO]
+        );
+      } else {
+        // Swap tokens for tokens
+        const path = [sellAddr, buyAddr];
+        result = await web3Service.swapExactTokensForTokens(
+          amountIn,
+          minAmountOut,
+          path
+        );
+      }
+      
+      setTxHash(result.hash);
+      setSwapSuccess(true);
+      
+      // Also record in backend
       await executeSwap(
         address,
         sellToken.address,
@@ -156,17 +246,18 @@ const SwapPage = () => {
         parseFloat(sellAmount),
         parseFloat(buyAmount),
         slippage,
-        `0x${Date.now().toString(16)}`
+        result.hash
       );
       
-      setSwapSuccess(true);
       setTimeout(() => {
         setSwapSuccess(false);
         setSellAmount('');
         setBuyAmount('');
-      }, 3000);
+        setTxHash(null);
+      }, 5000);
     } catch (error) {
       console.error('Swap failed:', error);
+      alert('Swap failed: ' + (error.reason || error.message));
     }
     
     setIsSwapping(false);
