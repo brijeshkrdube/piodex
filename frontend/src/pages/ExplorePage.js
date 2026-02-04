@@ -36,7 +36,19 @@ const ExplorePage = () => {
           getPools(),
           getStats()
         ]);
-        setTokens(fetchedTokens);
+        
+        // Filter tokens to only show those with active trading pools
+        const tokensInPools = new Set();
+        fetchedPools.forEach(pool => {
+          tokensInPools.add(pool.token0.address.toLowerCase());
+          tokensInPools.add(pool.token1.address.toLowerCase());
+        });
+        
+        const activeTokens = fetchedTokens.filter(token => 
+          tokensInPools.has(token.address.toLowerCase())
+        );
+        
+        setTokens(activeTokens);
         setPools(fetchedPools);
         setStats(fetchedStats);
       } catch (error) {
