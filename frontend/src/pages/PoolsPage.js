@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { ethers } from 'ethers';
 import { useWallet } from '../context/WalletContext';
 import { FEE_TIERS, formatCurrency } from '../data/mock';
 import { getPools, createPool as createPoolAPI, getTokens } from '../services/api';
+import { web3Service, CONTRACT_ADDRESSES, FACTORY_ABI } from '../services/web3';
 import TokenSelector from '../components/TokenSelector';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
