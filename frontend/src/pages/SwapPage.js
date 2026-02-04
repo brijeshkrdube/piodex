@@ -90,17 +90,14 @@ const SwapPage = () => {
     const debounceTimer = setTimeout(fetchQuote, 300);
     return () => clearTimeout(debounceTimer);
   }, [fetchQuote]);
-      return (parseFloat(sellAmount) * exchangeRate).toFixed(6);
-    }
-    return '';
-  }, [sellAmount, exchangeRate]);
 
   const handleSwapTokens = () => {
     const tempToken = sellToken;
     const tempAmount = sellAmount;
     setSellToken(buyToken);
     setBuyToken(tempToken);
-    setSellAmount(calculatedBuyAmount);
+    setSellAmount(buyAmount);
+    setBuyAmount(tempAmount);
   };
 
   const handleMaxClick = () => {
@@ -115,8 +112,30 @@ const SwapPage = () => {
     
     setIsSwapping(true);
     
-    // Simulate swap transaction
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      // Execute swap via API
+      await executeSwap(
+        address,
+        sellToken.address,
+        buyToken.address,
+        parseFloat(sellAmount),
+        parseFloat(buyAmount),
+        slippage,
+        `0x${Date.now().toString(16)}` // Mock tx hash
+      );
+      
+      setSwapSuccess(true);
+      setTimeout(() => {
+        setSwapSuccess(false);
+        setSellAmount('');
+        setBuyAmount('');
+      }, 3000);
+    } catch (error) {
+      console.error('Swap failed:', error);
+    }
+    
+    setIsSwapping(false);
+  };
     
     setIsSwapping(false);
     setSwapSuccess(true);
