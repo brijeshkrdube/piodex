@@ -146,14 +146,12 @@ const SwapPage = () => {
   // Check if approval is needed for the sell token
   const checkApproval = useCallback(async () => {
     if (!isConnected || !sellToken || !sellAmount || parseFloat(sellAmount) <= 0) {
-      setNeedsApproval(false);
-      return;
+      return false;
     }
 
     // Native token (PIO) doesn't need approval
     if (sellToken.isNative || sellToken.address === '0x0000000000000000000000000000000000000000') {
-      setNeedsApproval(false);
-      return;
+      return false;
     }
 
     try {
@@ -163,15 +161,23 @@ const SwapPage = () => {
         address
       );
       const sellAmountNum = parseFloat(sellAmount);
-      setNeedsApproval(parseFloat(allowance) < sellAmountNum);
+      return parseFloat(allowance) < sellAmountNum;
     } catch (error) {
       console.error('Error checking allowance:', error);
-      setNeedsApproval(true);
+      return true;
     }
   }, [isConnected, sellToken, sellAmount, address]);
 
   useEffect(() => {
-    checkApproval();
+    let isMounted = true;
+    const check = async () => {
+      const needs = await checkApproval();
+      if (isMounted) {
+        setNeedsApproval(needs);
+      }
+    };
+    check();
+    return () => { isMounted = false; };
   }, [checkApproval]);
 
   const handleApprove = async () => {
