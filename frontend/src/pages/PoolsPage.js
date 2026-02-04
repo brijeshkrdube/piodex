@@ -154,6 +154,7 @@ const PoolsPage = () => {
           </div>
           <Button
             onClick={() => setShowCreatePool(true)}
+            data-testid="create-pool-btn"
             className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-xl gap-2"
           >
             <Plus className="w-4 h-4" />
