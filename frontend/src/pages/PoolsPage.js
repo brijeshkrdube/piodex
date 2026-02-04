@@ -52,6 +52,9 @@ const PoolsPage = () => {
   // Initial liquidity amounts
   const [amount0, setAmount0] = useState('');
   const [amount1, setAmount1] = useState('');
+  const [txHash, setTxHash] = useState(null);
+  const [pairAddress, setPairAddress] = useState(null);
+  const [useBlockchain, setUseBlockchain] = useState(true);
 
   // Handle redirect from TokenSelector with custom token
   useEffect(() => {
