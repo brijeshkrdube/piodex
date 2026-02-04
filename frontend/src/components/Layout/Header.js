@@ -248,7 +248,7 @@ const Header = () => {
             </button>
           </div>
           <p className="text-xs text-gray-500 text-center mt-4">
-            By connecting, you agree to PioSwap's Terms of Service
+            By connecting, you agree to PioSwap&apos;s Terms of Service
           </p>
         </DialogContent>
       </Dialog>
