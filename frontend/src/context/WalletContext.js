@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { web3Service, PIOGOLD_NETWORK } from '../services/web3';
 
 const WalletContext = createContext();
@@ -19,50 +19,9 @@ export const WalletProvider = ({ children }) => {
   const [chainId, setChainId] = useState(null);
   const [isCorrectNetwork, setIsCorrectNetwork] = useState(false);
   const [error, setError] = useState(null);
-
-  // Check if already connected on mount
-  useEffect(() => {
-    const checkConnection = async () => {
-      if (web3Service.isMetaMaskInstalled() && window.ethereum.selectedAddress) {
-        try {
-          await connectWallet();
-        } catch (err) {
-          console.log('Auto-connect failed:', err);
-        }
-      }
-    };
-    checkConnection();
-  }, [connectWallet]);
-
-  // Listen for wallet events
-  useEffect(() => {
-    const handleAccountChanged = (e) => {
-      setAddress(e.detail.address);
-      loadBalances(e.detail.address);
-    };
-
-    const handleChainChanged = (e) => {
-      setChainId(e.detail.chainId);
-      setIsCorrectNetwork(e.detail.chainId === PIOGOLD_NETWORK.chainId);
-    };
-
-    const handleDisconnected = () => {
-      setIsConnected(false);
-      setAddress(null);
-      setBalances({});
-      setChainId(null);
-    };
-
-    window.addEventListener('walletAccountChanged', handleAccountChanged);
-    window.addEventListener('walletChainChanged', handleChainChanged);
-    window.addEventListener('walletDisconnected', handleDisconnected);
-
-    return () => {
-      window.removeEventListener('walletAccountChanged', handleAccountChanged);
-      window.removeEventListener('walletChainChanged', handleChainChanged);
-      window.removeEventListener('walletDisconnected', handleDisconnected);
-    };
-  }, [loadBalances]);
+  
+  // Track if auto-connect has run
+  const hasAutoConnected = useRef(false);
 
   // Load token balances
   const loadBalances = useCallback(async (walletAddress) => {
@@ -147,6 +106,53 @@ export const WalletProvider = ({ children }) => {
       return false;
     }
   }, []);
+
+  // Check if already connected on mount
+  useEffect(() => {
+    const checkConnection = async () => {
+      if (hasAutoConnected.current) return;
+      hasAutoConnected.current = true;
+      
+      if (web3Service.isMetaMaskInstalled() && window.ethereum?.selectedAddress) {
+        try {
+          await connectWallet();
+        } catch (err) {
+          console.log('Auto-connect failed:', err);
+        }
+      }
+    };
+    checkConnection();
+  }, [connectWallet]);
+
+  // Listen for wallet events
+  useEffect(() => {
+    const handleAccountChanged = (e) => {
+      setAddress(e.detail.address);
+      loadBalances(e.detail.address);
+    };
+
+    const handleChainChanged = (e) => {
+      setChainId(e.detail.chainId);
+      setIsCorrectNetwork(e.detail.chainId === PIOGOLD_NETWORK.chainId);
+    };
+
+    const handleDisconnected = () => {
+      setIsConnected(false);
+      setAddress(null);
+      setBalances({});
+      setChainId(null);
+    };
+
+    window.addEventListener('walletAccountChanged', handleAccountChanged);
+    window.addEventListener('walletChainChanged', handleChainChanged);
+    window.addEventListener('walletDisconnected', handleDisconnected);
+
+    return () => {
+      window.removeEventListener('walletAccountChanged', handleAccountChanged);
+      window.removeEventListener('walletChainChanged', handleChainChanged);
+      window.removeEventListener('walletDisconnected', handleDisconnected);
+    };
+  }, [loadBalances]);
 
   const value = {
     isConnected,
