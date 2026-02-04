@@ -68,22 +68,27 @@ const SwapPage = () => {
   // Generate mock recent trades
   useEffect(() => {
     if (sellToken && buyToken) {
-      const mockTrades = [];
-      const now = Date.now();
-      for (let i = 0; i < 10; i++) {
-        const isBuy = Math.random() > 0.5;
-        const amount = (Math.random() * 1000 + 10).toFixed(2);
-        const price = (sellToken.price / buyToken.price * (0.99 + Math.random() * 0.02)).toFixed(6);
-        mockTrades.push({
-          id: i,
-          type: isBuy ? 'buy' : 'sell',
-          amount,
-          price,
-          total: (amount * price).toFixed(2),
-          time: new Date(now - i * 60000 * Math.random() * 10).toLocaleTimeString()
-        });
-      }
-      setRecentTrades(mockTrades);
+      const generateTrades = () => {
+        const mockTrades = [];
+        const now = Date.now();
+        for (let i = 0; i < 10; i++) {
+          const isBuy = Math.random() > 0.5;
+          const amount = (Math.random() * 1000 + 10).toFixed(2);
+          const price = (sellToken.price / buyToken.price * (0.99 + Math.random() * 0.02)).toFixed(6);
+          mockTrades.push({
+            id: i,
+            type: isBuy ? 'buy' : 'sell',
+            amount,
+            price,
+            total: (amount * price).toFixed(2),
+            time: new Date(now - i * 60000 * Math.random() * 10).toLocaleTimeString()
+          });
+        }
+        setRecentTrades(mockTrades);
+      };
+      // Use timeout to avoid synchronous setState in effect
+      const timer = setTimeout(generateTrades, 0);
+      return () => clearTimeout(timer);
     }
   }, [sellToken, buyToken]);
 
