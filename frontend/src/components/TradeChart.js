@@ -172,6 +172,7 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
     window.addEventListener('resize', handleResize);
 
     return () => {
+      isMounted = false;
       window.removeEventListener('resize', handleResize);
       if (chartRef.current) {
         chartRef.current.remove();
