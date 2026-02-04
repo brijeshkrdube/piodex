@@ -86,7 +86,8 @@ const Header = () => {
                   {item.label}
                 </Link>
               );
-            })}n          </nav>
+            })}
+          </nav>
 
           {/* Right Section */}
           <div className="flex items-center gap-3">
