@@ -46,14 +46,12 @@ const SwapPage = () => {
     ? sellToken.price / buyToken.price 
     : 0;
 
-  // Update buy amount when sell amount changes
-  useEffect(() => {
+  // Calculate buy amount based on sell amount
+  const calculatedBuyAmount = React.useMemo(() => {
     if (sellAmount && !isNaN(sellAmount) && exchangeRate) {
-      const calculated = parseFloat(sellAmount) * exchangeRate;
-      setBuyAmount(calculated.toFixed(6));
-    } else {
-      setBuyAmount('');
+      return (parseFloat(sellAmount) * exchangeRate).toFixed(6);
     }
+    return '';
   }, [sellAmount, exchangeRate]);
 
   const handleSwapTokens = () => {
