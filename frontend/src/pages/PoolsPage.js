@@ -313,7 +313,7 @@ const PoolsPage = () => {
 
       {/* Create Pool Modal */}
       <Dialog open={showCreatePool} onOpenChange={setShowCreatePool}>
-        <DialogContent className="bg-[#1a1a1a] border-white/10 text-white sm:max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-[#1a1a1a] border-white/10 text-white sm:max-w-lg max-h-[90vh] overflow-y-auto" data-testid="create-pool-modal">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Create New Pool</DialogTitle>
             <DialogDescription className="text-gray-400">
@@ -328,6 +328,7 @@ const PoolsPage = () => {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setShowToken0Selector(true)}
+                  data-testid="select-token0-btn"
                   className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
                 >
                   {token0 ? (
@@ -346,6 +347,7 @@ const PoolsPage = () => {
 
                 <button
                   onClick={() => setShowToken1Selector(true)}
+                  data-testid="select-token1-btn"
                   className="flex items-center gap-3 p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
                 >
                   {token1 ? (
