@@ -156,9 +156,11 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
       setLoading(false);
     };
     
-    setLoading(true);
     // Use requestAnimationFrame to avoid synchronous setState in effect
-    requestAnimationFrame(initChart);
+    requestAnimationFrame(() => {
+      setLoading(true);
+      requestAnimationFrame(initChart);
+    });
 
     // Handle resize
     const handleResize = () => {
