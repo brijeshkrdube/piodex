@@ -252,7 +252,7 @@ const PoolsPage = () => {
               </div>
               <span className="text-gray-400">Total Value Locked</span>
             </div>
-            <div className="text-2xl font-bold text-white">$20.76M</div>
+            <div className="text-2xl font-bold text-white">{formatCurrency(totalTVL)}</div>
           </Card>
 
           <Card className="bg-[#1a1a1a] border-white/5 p-6 rounded-2xl">
@@ -262,7 +262,7 @@ const PoolsPage = () => {
               </div>
               <span className="text-gray-400">24h Volume</span>
             </div>
-            <div className="text-2xl font-bold text-white">$2.12M</div>
+            <div className="text-2xl font-bold text-white">{formatCurrency(totalVolume24h)}</div>
           </Card>
 
           <Card className="bg-[#1a1a1a] border-white/5 p-6 rounded-2xl">
@@ -272,7 +272,7 @@ const PoolsPage = () => {
               </div>
               <span className="text-gray-400">Active Pools</span>
             </div>
-            <div className="text-2xl font-bold text-white">{POOLS.length}</div>
+            <div className="text-2xl font-bold text-white">{pools.length}</div>
           </Card>
         </div>
       </div>
