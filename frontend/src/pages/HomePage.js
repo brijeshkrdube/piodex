@@ -176,7 +176,7 @@ const HomePage = () => {
               <div className="text-gray-400">All time swappers</div>
             </Card>
             <Card className="bg-[#1a1a1a] border-white/5 p-6 rounded-2xl text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-2">${PROTOCOL_STATS.volume24h}</div>
+              <div className="text-3xl md:text-4xl font-bold text-white mb-2">${formatStatNumber(stats?.volume24h || 0)}</div>
               <div className="text-gray-400">24H swap volume</div>
             </Card>
           </div>
