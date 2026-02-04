@@ -36,7 +36,8 @@ class PoolBase(BaseModel):
 
 
 class PoolCreate(PoolBase):
-    pass
+    amount0: Optional[float] = 0.0
+    amount1: Optional[float] = 0.0
 
 
 class Pool(BaseModel):
