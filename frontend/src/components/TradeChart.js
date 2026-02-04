@@ -124,8 +124,8 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
         }
       });
 
-      // Add candlestick series
-      const candlestickSeries = chart.addCandlestickSeries({
+      // Add candlestick series (v5 API)
+      const candlestickSeries = chart.addSeries(CandlestickSeries, {
         upColor: '#22c55e',
         downColor: '#ef4444',
         borderDownColor: '#ef4444',
@@ -135,17 +135,13 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
       });
       candlestickSeries.setData(priceData);
 
-      // Add volume series
-      const volumeSeries = chart.addHistogramSeries({
+      // Add volume series (v5 API)
+      const volumeSeries = chart.addSeries(HistogramSeries, {
         color: '#26a69a',
         priceFormat: {
           type: 'volume'
         },
         priceScaleId: '',
-        scaleMargins: {
-          top: 0.8,
-          bottom: 0
-        }
       });
       volumeSeries.setData(volumeData);
 
