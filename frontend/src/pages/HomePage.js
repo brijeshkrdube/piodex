@@ -290,16 +290,7 @@ const HomePage = () => {
         </div>
       </footer>
 
-      {/* CSS for ticker animation */}
-      <style jsx>{`
-        @keyframes scroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-        .animate-scroll {
-          animation: scroll 30s linear infinite;
-        }
-      `}</style>
+      {/* CSS for ticker animation is in App.css */}
     </div>
   );
 };
