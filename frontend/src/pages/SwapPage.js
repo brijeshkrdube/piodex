@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useWallet } from '../context/WalletContext';
-import { TOKENS, formatNumber } from '../data/mock';
+import { NETWORK_CONFIG } from '../data/mock';
+import { getTokens, getSwapQuote, executeSwap } from '../services/api';
 import TokenSelector from '../components/TokenSelector';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
 import { Card } from '../components/ui/card';
 import {
   Tooltip,
@@ -16,7 +16,6 @@ import {
   Settings,
   Info,
   ChevronDown,
-  RefreshCw,
   AlertTriangle,
   Check,
   Loader2
@@ -28,26 +27,69 @@ import {
 } from '../components/ui/popover';
 
 const SwapPage = () => {
-  const { isConnected, connectWallet, getBalance, isConnecting } = useWallet();
+  const { isConnected, connectWallet, getBalance, isConnecting, address } = useWallet();
   
-  const [sellToken, setSellToken] = useState(TOKENS[0]); // PIO
-  const [buyToken, setBuyToken] = useState(TOKENS[2]); // USDT
+  const [tokens, setTokens] = useState([]);
+  const [sellToken, setSellToken] = useState(null);
+  const [buyToken, setBuyToken] = useState(null);
   const [sellAmount, setSellAmount] = useState('');
+  const [buyAmount, setBuyAmount] = useState('');
   const [showSellSelector, setShowSellSelector] = useState(false);
   const [showBuySelector, setShowBuySelector] = useState(false);
   const [slippage, setSlippage] = useState(0.5);
   const [isSwapping, setIsSwapping] = useState(false);
   const [swapSuccess, setSwapSuccess] = useState(false);
-  const [priceImpact] = useState(0.12);
-  
-  // Calculate exchange rate
-  const exchangeRate = sellToken && buyToken 
-    ? sellToken.price / buyToken.price 
-    : 0;
+  const [priceImpact, setPriceImpact] = useState(0);
+  const [exchangeRate, setExchangeRate] = useState(0);
+  const [isLoadingQuote, setIsLoadingQuote] = useState(false);
 
-  // Calculate buy amount based on sell amount
-  const calculatedBuyAmount = React.useMemo(() => {
-    if (sellAmount && !isNaN(sellAmount) && exchangeRate) {
+  // Load tokens on mount
+  useEffect(() => {
+    const loadTokens = async () => {
+      try {
+        const fetchedTokens = await getTokens();
+        setTokens(fetchedTokens);
+        if (fetchedTokens.length >= 3) {
+          setSellToken(fetchedTokens[0]); // PIO
+          setBuyToken(fetchedTokens[2]); // USDT
+        }
+      } catch (error) {
+        console.error('Error loading tokens:', error);
+      }
+    };
+    loadTokens();
+  }, []);
+
+  // Get swap quote when sell amount changes
+  const fetchQuote = useCallback(async () => {
+    if (!sellToken || !buyToken || !sellAmount || parseFloat(sellAmount) <= 0) {
+      setBuyAmount('');
+      setPriceImpact(0);
+      setExchangeRate(0);
+      return;
+    }
+
+    setIsLoadingQuote(true);
+    try {
+      const quote = await getSwapQuote(sellToken.address, buyToken.address, parseFloat(sellAmount));
+      setBuyAmount(quote.amountOut.toString());
+      setPriceImpact(quote.priceImpact);
+      setExchangeRate(quote.exchangeRate);
+    } catch (error) {
+      console.error('Error fetching quote:', error);
+      // Fallback to simple calculation
+      const rate = sellToken.price / buyToken.price;
+      setBuyAmount((parseFloat(sellAmount) * rate * 0.997).toFixed(6));
+      setExchangeRate(rate);
+      setPriceImpact(0.1);
+    }
+    setIsLoadingQuote(false);
+  }, [sellToken, buyToken, sellAmount]);
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(fetchQuote, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [fetchQuote]);
       return (parseFloat(sellAmount) * exchangeRate).toFixed(6);
     }
     return '';
