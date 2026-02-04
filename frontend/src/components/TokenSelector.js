@@ -122,8 +122,11 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
   // Clear custom token info when search is not a contract address
   useEffect(() => {
     if (!isContractAddress) {
-      setCustomTokenInfo(null);
-      setCustomTokenError(null);
+      const timer = setTimeout(() => {
+        setCustomTokenInfo(null);
+        setCustomTokenError(null);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isContractAddress]);
 
