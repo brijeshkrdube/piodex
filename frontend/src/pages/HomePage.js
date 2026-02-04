@@ -118,8 +118,14 @@ const HomePage = () => {
             <div className="flex items-center gap-3 mb-4">
               <div className="flex-1 text-3xl font-bold text-gray-600">0</div>
               <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10">
-                <img src={TOKENS[0].logo} alt="PIO" className="w-6 h-6 rounded-full" />
-                <span className="font-semibold text-white">PIO</span>
+                {tokens[0] ? (
+                  <>
+                    <img src={tokens[0].logo} alt="PIO" className="w-6 h-6 rounded-full" />
+                    <span className="font-semibold text-white">PIO</span>
+                  </>
+                ) : (
+                  <span className="text-gray-400">Select</span>
+                )}
               </div>
             </div>
             <div className="flex items-center justify-between text-sm text-gray-400 mb-2">
@@ -158,15 +164,15 @@ const HomePage = () => {
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <Card className="bg-[#1a1a1a] border-white/5 p-6 rounded-2xl text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-2">${PROTOCOL_STATS.totalVolume}</div>
+              <div className="text-3xl md:text-4xl font-bold text-white mb-2">${formatStatNumber(stats?.totalVolume || 0)}</div>
               <div className="text-gray-400">All time volume</div>
             </Card>
             <Card className="bg-[#1a1a1a] border-white/5 p-6 rounded-2xl text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-2">${PROTOCOL_STATS.tvl}</div>
+              <div className="text-3xl md:text-4xl font-bold text-white mb-2">${formatStatNumber(stats?.tvl || 0)}</div>
               <div className="text-gray-400">Total value locked</div>
             </Card>
             <Card className="bg-[#1a1a1a] border-white/5 p-6 rounded-2xl text-center">
-              <div className="text-3xl md:text-4xl font-bold text-white mb-2">{PROTOCOL_STATS.totalSwappers}</div>
+              <div className="text-3xl md:text-4xl font-bold text-white mb-2">{formatStatNumber(stats?.totalSwappers || 0)}</div>
               <div className="text-gray-400">All time swappers</div>
             </Card>
             <Card className="bg-[#1a1a1a] border-white/5 p-6 rounded-2xl text-center">
