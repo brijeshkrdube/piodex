@@ -499,15 +499,45 @@ const PoolsPage = () => {
               </div>
             )}
 
-            {/* Warning about no smart contract */}
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+            {/* Info about blockchain integration */}
+            <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/30">
               <div className="flex items-start gap-2">
-                <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-amber-200">
-                  <strong>Note:</strong> This creates a pool in the PioSwap database. For real on-chain liquidity, smart contracts need to be deployed on PIOGOLD network.
+                <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-green-200">
+                  <strong>Blockchain Enabled:</strong> Pools will be created on-chain via the Factory contract at {CONTRACT_ADDRESSES.FACTORY.slice(0, 10)}...
                 </div>
               </div>
             </div>
+
+            {/* Transaction info */}
+            {txHash && (
+              <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30">
+                <div className="text-sm text-blue-200">
+                  <strong>Transaction:</strong>{' '}
+                  <a 
+                    href={`https://pioscan.com/tx/${txHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 underline"
+                  >
+                    {txHash.slice(0, 20)}...
+                  </a>
+                </div>
+                {pairAddress && (
+                  <div className="text-sm text-blue-200 mt-1">
+                    <strong>Pair Address:</strong>{' '}
+                    <a 
+                      href={`https://pioscan.com/address/${pairAddress}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 hover:text-blue-300 underline"
+                    >
+                      {pairAddress.slice(0, 20)}...
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Create Button */}
             <Button
