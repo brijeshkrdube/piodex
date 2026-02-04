@@ -49,6 +49,9 @@ const SwapPage = () => {
   const [isLoadingQuote, setIsLoadingQuote] = useState(false);
   const [activeView, setActiveView] = useState('swap');
   const [recentTrades, setRecentTrades] = useState([]);
+  const [needsApproval, setNeedsApproval] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+  const [txHash, setTxHash] = useState(null);
 
   // Load tokens on mount
   useEffect(() => {
