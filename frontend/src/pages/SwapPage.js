@@ -58,8 +58,7 @@ const SwapPage = () => {
     const tempAmount = sellAmount;
     setSellToken(buyToken);
     setBuyToken(tempToken);
-    setSellAmount(buyAmount);
-    setBuyAmount(tempAmount);
+    setSellAmount(calculatedBuyAmount);
   };
 
   const handleMaxClick = () => {
