@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { TOKENS } from '../data/mock';
+import React, { useState, useMemo, useEffect } from 'react';
+import { getTokens } from '../services/api';
 import { useWallet } from '../context/WalletContext';
 import {
   Dialog,
@@ -9,14 +9,37 @@ import {
 } from './ui/dialog';
 import { Input } from './ui/input';
 import { ScrollArea } from './ui/scroll-area';
-import { Search, Star, X } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 
-const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeToken }) => {
+const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeToken, tokens: propTokens }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [tokens, setTokens] = useState(propTokens || []);
+  const [loading, setLoading] = useState(false);
   const { getBalance, isConnected } = useWallet();
 
+  // Load tokens if not provided via props
+  useEffect(() => {
+    if (propTokens && propTokens.length > 0) {
+      setTokens(propTokens);
+      return;
+    }
+    
+    const loadTokens = async () => {
+      if (!open) return;
+      setLoading(true);
+      try {
+        const fetchedTokens = await getTokens();
+        setTokens(fetchedTokens);
+      } catch (error) {
+        console.error('Error loading tokens:', error);
+      }
+      setLoading(false);
+    };
+    loadTokens();
+  }, [open, propTokens]);
+
   const filteredTokens = useMemo(() => {
-    return TOKENS.filter(token => {
+    return tokens.filter(token => {
       if (excludeToken && token.id === excludeToken.id) return false;
       const query = searchQuery.toLowerCase();
       return (
@@ -25,9 +48,9 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
         token.address.toLowerCase().includes(query)
       );
     });
-  }, [searchQuery, excludeToken]);
+  }, [searchQuery, excludeToken, tokens]);
 
-  const popularTokens = TOKENS.filter(t => ['pio', 'usdt', 'usdc', 'peth'].includes(t.id));
+  const popularTokens = tokens.filter(t => ['pio', 'usdt', 'usdc', 'peth'].includes(t.id));
 
   const handleSelect = (token) => {
     onSelect(token);
@@ -56,7 +79,7 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
         </div>
 
         {/* Popular Tokens */}
-        {!searchQuery && (
+        {!searchQuery && popularTokens.length > 0 && (
           <div className="px-4 pb-3">
             <div className="flex flex-wrap gap-2">
               {popularTokens.map((token) => (
@@ -83,7 +106,11 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
         {/* Token List */}
         <ScrollArea className="h-[300px] border-t border-white/10">
           <div className="p-2">
-            {filteredTokens.length === 0 ? (
+            {loading ? (
+              <div className="py-8 flex justify-center">
+                <Loader2 className="w-6 h-6 text-amber-400 animate-spin" />
+              </div>
+            ) : filteredTokens.length === 0 ? (
               <div className="py-8 text-center text-gray-500">
                 No tokens found
               </div>
