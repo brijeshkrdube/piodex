@@ -67,7 +67,7 @@ async def get_pool(pool_id: str):
 
 @router.post("", response_model=PoolResponse)
 async def create_pool(pool_data: PoolCreate):
-    """Create a new liquidity pool"""
+    """Create a new liquidity pool with optional initial liquidity"""
     try:
         # Normalize addresses
         token0_addr = pool_data.token0_address.lower()
@@ -90,19 +90,32 @@ async def create_pool(pool_data: PoolCreate):
         if existing:
             raise HTTPException(status_code=400, detail="Pool already exists")
         
+        # Calculate initial TVL from liquidity amounts
+        amount0 = pool_data.amount0 or 0.0
+        amount1 = pool_data.amount1 or 0.0
+        token0_price = token0.get("price", 1)
+        token1_price = token1.get("price", 1)
+        initial_tvl = (amount0 * token0_price) + (amount1 * token1_price)
+        
+        # Calculate estimated APR based on fee tier and liquidity
+        base_apr = pool_data.fee * 100  # Higher fee = higher potential APR
+        estimated_apr = base_apr * (1 + (initial_tvl / 1000000)) if initial_tvl > 0 else base_apr
+        
         pool = Pool(
             id=str(uuid.uuid4()),
             token0_address=token0_addr,
             token1_address=token1_addr,
             fee=pool_data.fee,
-            tvl=0.0,
+            tvl=initial_tvl,
             volume_24h=0.0,
-            apr=0.0,
-            token0_reserve=0.0,
-            token1_reserve=0.0
+            apr=min(estimated_apr, 100.0),  # Cap APR at 100%
+            token0_reserve=amount0,
+            token1_reserve=amount1
         )
         
         await db.pools.insert_one(pool.model_dump())
+        
+        logger.info(f"Created new pool {pool.id} for {token0['symbol']}/{token1['symbol']} with TVL ${initial_tvl:.2f}")
         
         return PoolResponse(
             id=pool.id,
