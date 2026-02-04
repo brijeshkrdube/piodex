@@ -400,6 +400,7 @@ const PoolsPage = () => {
                       value={amount0}
                       onChange={(e) => setAmount0(e.target.value)}
                       placeholder="0.0"
+                      data-testid="amount0-input"
                       className="flex-1 bg-transparent text-white text-right focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
@@ -411,6 +412,7 @@ const PoolsPage = () => {
                       value={amount1}
                       onChange={(e) => setAmount1(e.target.value)}
                       placeholder="0.0"
+                      data-testid="amount1-input"
                       className="flex-1 bg-transparent text-white text-right focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   </div>
