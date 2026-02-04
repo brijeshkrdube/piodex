@@ -101,7 +101,44 @@ const PoolsPage = () => {
     if (!token0 || !token1) return;
     
     setIsCreating(true);
+    setTxHash(null);
+    setPairAddress(null);
+    
     try {
+      // Get token addresses (use WPIO for native PIO)
+      const addr0 = token0.isNative ? CONTRACT_ADDRESSES.WPIO : token0.address;
+      const addr1 = token1.isNative ? CONTRACT_ADDRESSES.WPIO : token1.address;
+      
+      // Check if pair already exists on-chain
+      const existingPair = await web3Service.getPairAddress(addr0, addr1);
+      
+      if (existingPair && existingPair !== ethers.constants.AddressZero) {
+        // Pair already exists, just add liquidity
+        setPairAddress(existingPair);
+        alert(`Pool already exists at ${existingPair}. You can add liquidity to this pool.`);
+        setIsCreating(false);
+        return;
+      }
+      
+      if (isConnected && useBlockchain) {
+        // Create pair on blockchain using Factory contract
+        const provider = web3Service.getProvider();
+        const signer = provider.getSigner();
+        const factory = new ethers.Contract(CONTRACT_ADDRESSES.FACTORY, FACTORY_ABI, signer);
+        
+        const tx = await factory.createPair(addr0, addr1);
+        setTxHash(tx.hash);
+        
+        const receipt = await tx.wait();
+        
+        // Get the new pair address from the event
+        const pairCreatedEvent = receipt.events?.find(e => e.event === 'PairCreated');
+        if (pairCreatedEvent) {
+          setPairAddress(pairCreatedEvent.args.pair);
+        }
+      }
+      
+      // Also record in backend database
       await createPoolAPI(
         token0.address, 
         token1.address, 
@@ -109,6 +146,7 @@ const PoolsPage = () => {
         parseFloat(amount0) || 0,
         parseFloat(amount1) || 0
       );
+      
       setCreateSuccess(true);
       
       // Refresh pools list
@@ -122,10 +160,43 @@ const PoolsPage = () => {
         setToken1(null);
         setAmount0('');
         setAmount1('');
-      }, 2000);
+        setTxHash(null);
+        setPairAddress(null);
+      }, 5000);
     } catch (error) {
       console.error('Error creating pool:', error);
-      alert(error.response?.data?.detail || 'Failed to create pool');
+      
+      // If blockchain fails, try database-only mode
+      if (error.code === 4001) {
+        alert('Transaction rejected by user');
+      } else if (error.reason) {
+        alert(`Failed to create pool: ${error.reason}`);
+      } else {
+        // Fallback to database only
+        try {
+          await createPoolAPI(
+            token0.address, 
+            token1.address, 
+            selectedFee.value,
+            parseFloat(amount0) || 0,
+            parseFloat(amount1) || 0
+          );
+          setCreateSuccess(true);
+          const fetchedPools = await getPools();
+          setPools(fetchedPools);
+          
+          setTimeout(() => {
+            setShowCreatePool(false);
+            setCreateSuccess(false);
+            setToken0(null);
+            setToken1(null);
+            setAmount0('');
+            setAmount1('');
+          }, 2000);
+        } catch (dbError) {
+          alert(dbError.response?.data?.detail || 'Failed to create pool');
+        }
+      }
     }
     setIsCreating(false);
   };
