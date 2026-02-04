@@ -72,17 +72,37 @@ const PoolsPage = () => {
     if (!token0 || !token1) return;
     
     setIsCreating(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      await createPoolAPI(token0.address, token1.address, selectedFee.value);
+      setCreateSuccess(true);
+      
+      // Refresh pools list
+      const fetchedPools = await getPools();
+      setPools(fetchedPools);
+      
+      setTimeout(() => {
+        setShowCreatePool(false);
+        setCreateSuccess(false);
+        setToken0(null);
+        setToken1(null);
+      }, 2000);
+    } catch (error) {
+      console.error('Error creating pool:', error);
+    }
     setIsCreating(false);
-    setCreateSuccess(true);
-    
-    setTimeout(() => {
-      setShowCreatePool(false);
-      setCreateSuccess(false);
-      setToken0(null);
-      setToken1(null);
-    }, 2000);
   };
+
+  // Calculate total TVL
+  const totalTVL = pools.reduce((sum, pool) => sum + pool.tvl, 0);
+  const totalVolume24h = pools.reduce((sum, pool) => sum + (pool.volume24h || 0), 0);
+
+  if (loading) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] relative overflow-hidden">
