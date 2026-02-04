@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useWallet } from '../context/WalletContext';
 import { FEE_TIERS, formatCurrency } from '../data/mock';
-import { getPools, createPool as createPoolAPI } from '../services/api';
+import { getPools, createPool as createPoolAPI, getTokens } from '../services/api';
 import TokenSelector from '../components/TokenSelector';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
@@ -24,12 +24,15 @@ import {
   ExternalLink,
   Loader2,
   Check,
-  Wallet
+  Wallet,
+  AlertCircle
 } from 'lucide-react';
 
 const PoolsPage = () => {
-  const { isConnected, connectWallet, isConnecting } = useWallet();
+  const location = useLocation();
+  const { isConnected, connectWallet, isConnecting, address } = useWallet();
   const [pools, setPools] = useState([]);
+  const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreatePool, setShowCreatePool] = useState(false);
@@ -43,19 +46,37 @@ const PoolsPage = () => {
   const [selectedFee, setSelectedFee] = useState(FEE_TIERS[2]);
   const [isCreating, setIsCreating] = useState(false);
   const [createSuccess, setCreateSuccess] = useState(false);
+  
+  // Initial liquidity amounts
+  const [amount0, setAmount0] = useState('');
+  const [amount1, setAmount1] = useState('');
 
-  // Load pools on mount
+  // Handle redirect from TokenSelector with custom token
   useEffect(() => {
-    const loadPools = async () => {
+    if (location.state?.createPoolWith && location.state?.autoOpenCreate) {
+      setToken0(location.state.createPoolWith);
+      setShowCreatePool(true);
+      // Clear location state
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
+  // Load pools and tokens on mount
+  useEffect(() => {
+    const loadData = async () => {
       try {
-        const fetchedPools = await getPools();
+        const [fetchedPools, fetchedTokens] = await Promise.all([
+          getPools(),
+          getTokens()
+        ]);
         setPools(fetchedPools);
+        setTokens(fetchedTokens);
       } catch (error) {
-        console.error('Error loading pools:', error);
+        console.error('Error loading data:', error);
       }
       setLoading(false);
     };
-    loadPools();
+    loadData();
   }, []);
 
   const filteredPools = pools.filter(pool => {
