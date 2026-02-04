@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useWallet } from '../context/WalletContext';
-import { POOLS, TOKENS, formatCurrency, FEE_TIERS } from '../data/mock';
+import { FEE_TIERS, formatCurrency } from '../data/mock';
+import { getPools, createPool as createPoolAPI } from '../services/api';
 import TokenSelector from '../components/TokenSelector';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -19,17 +20,17 @@ import {
   Search,
   TrendingUp,
   Droplets,
-  Settings,
   ChevronDown,
   ExternalLink,
   Loader2,
   Check,
-  Info,
   Wallet
 } from 'lucide-react';
 
 const PoolsPage = () => {
-  const { isConnected, connectWallet, getBalance, isConnecting } = useWallet();
+  const { isConnected, connectWallet, isConnecting } = useWallet();
+  const [pools, setPools] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreatePool, setShowCreatePool] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
@@ -43,7 +44,21 @@ const PoolsPage = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [createSuccess, setCreateSuccess] = useState(false);
 
-  const filteredPools = POOLS.filter(pool => {
+  // Load pools on mount
+  useEffect(() => {
+    const loadPools = async () => {
+      try {
+        const fetchedPools = await getPools();
+        setPools(fetchedPools);
+      } catch (error) {
+        console.error('Error loading pools:', error);
+      }
+      setLoading(false);
+    };
+    loadPools();
+  }, []);
+
+  const filteredPools = pools.filter(pool => {
     const query = searchQuery.toLowerCase();
     return (
       pool.token0.symbol.toLowerCase().includes(query) ||
