@@ -121,6 +121,10 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
           borderColor: 'rgba(255, 255, 255, 0.1)',
           timeVisible: true,
           secondsVisible: false
+        },
+        localization: {
+          locale: 'en-US',
+          dateFormat: 'yyyy-MM-dd'
         }
       });
 
