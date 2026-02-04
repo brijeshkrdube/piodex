@@ -98,7 +98,7 @@ const ExplorePage = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <Card className="bg-[#1a1a1a] border-white/5 p-4 rounded-2xl">
             <div className="text-gray-400 text-sm mb-1">24h Volume</div>
-            <div className="text-xl font-bold text-white">$2.12M</div>
+            <div className="text-xl font-bold text-white">{formatCurrency(stats?.volume24h || 0)}</div>
             <div className="flex items-center gap-1 text-green-400 text-sm">
               <ArrowUpRight className="w-3 h-3" />
               +12.5%
@@ -106,7 +106,7 @@ const ExplorePage = () => {
           </Card>
           <Card className="bg-[#1a1a1a] border-white/5 p-4 rounded-2xl">
             <div className="text-gray-400 text-sm mb-1">TVL</div>
-            <div className="text-xl font-bold text-white">$20.76M</div>
+            <div className="text-xl font-bold text-white">{formatCurrency(stats?.tvl || 0)}</div>
             <div className="flex items-center gap-1 text-green-400 text-sm">
               <ArrowUpRight className="w-3 h-3" />
               +3.2%
@@ -114,7 +114,7 @@ const ExplorePage = () => {
           </Card>
           <Card className="bg-[#1a1a1a] border-white/5 p-4 rounded-2xl">
             <div className="text-gray-400 text-sm mb-1">Transactions</div>
-            <div className="text-xl font-bold text-white">15.4K</div>
+            <div className="text-xl font-bold text-white">{(stats?.transactions24h || 0).toLocaleString()}</div>
             <div className="flex items-center gap-1 text-red-400 text-sm">
               <ArrowDownRight className="w-3 h-3" />
               -2.1%
