@@ -206,7 +206,7 @@ const SwapPage = () => {
             <div className="flex items-center gap-3">
               <input
                 type="number"
-                value={buyAmount}
+                value={calculatedBuyAmount}
                 readOnly
                 placeholder="0"
                 className="flex-1 bg-transparent text-3xl font-medium text-white placeholder:text-gray-600 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -220,15 +220,15 @@ const SwapPage = () => {
                 <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
             </div>
-            {buyAmount && (
+            {calculatedBuyAmount && (
               <div className="mt-2 text-sm text-gray-500">
-                ~${(parseFloat(buyAmount) * buyToken?.price || 0).toFixed(2)}
+                ~${(parseFloat(calculatedBuyAmount) * buyToken?.price || 0).toFixed(2)}
               </div>
             )}
           </div>
 
           {/* Exchange Rate Info */}
-          {sellAmount && buyAmount && (
+          {sellAmount && calculatedBuyAmount && (
             <div className="mt-4 p-3 rounded-xl bg-white/5 space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-400">Rate</span>
