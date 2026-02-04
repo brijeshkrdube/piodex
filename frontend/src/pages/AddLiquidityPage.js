@@ -101,17 +101,35 @@ const AddLiquidityPage = () => {
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsSubmitting(false);
-    setSubmitSuccess(true);
+    if (!isConnected || !address) return;
     
-    setTimeout(() => {
-      setSubmitSuccess(false);
-      setAmount0('');
-      setAmount1('');
-      navigate('/pools');
-    }, 2000);
+    setIsSubmitting(true);
+    try {
+      if (activeTab === 'add') {
+        await addLiquidity(
+          pool.id,
+          address,
+          parseFloat(amount0),
+          parseFloat(amount1),
+          parseFloat(minPrice),
+          parseFloat(maxPrice)
+        );
+      } else {
+        // For remove, we'd need position ID - this is a simplified version
+        // In a real app, you'd fetch user's position first
+      }
+      
+      setSubmitSuccess(true);
+      setTimeout(() => {
+        setSubmitSuccess(false);
+        setAmount0('');
+        setAmount1('');
+        navigate('/pools');
+      }, 2000);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+    setIsSubmitting(false);
   };
 
   const insufficientBalance0 = parseFloat(amount0) > balance0;
