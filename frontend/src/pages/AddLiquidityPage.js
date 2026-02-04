@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useWallet } from '../context/WalletContext';
-import { POOLS, TOKENS, formatCurrency } from '../data/mock';
+import { getPool, addLiquidity, removeLiquidity } from '../services/api';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -27,11 +27,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 const AddLiquidityPage = () => {
   const { poolId } = useParams();
   const navigate = useNavigate();
-  const { isConnected, connectWallet, getBalance, isConnecting } = useWallet();
+  const { isConnected, connectWallet, getBalance, isConnecting, address } = useWallet();
   
-  // Find pool or use default
-  const pool = POOLS.find(p => p.id === poolId) || POOLS[0];
-  
+  const [pool, setPool] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('add');
   const [amount0, setAmount0] = useState('');
   const [amount1, setAmount1] = useState('');
@@ -40,6 +39,39 @@ const AddLiquidityPage = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [minPrice, setMinPrice] = useState('2.20');
   const [maxPrice, setMaxPrice] = useState('2.80');
+
+  // Load pool data
+  useEffect(() => {
+    const loadPool = async () => {
+      try {
+        const fetchedPool = await getPool(poolId);
+        setPool(fetchedPool);
+      } catch (error) {
+        console.error('Error loading pool:', error);
+      }
+      setLoading(false);
+    };
+    loadPool();
+  }, [poolId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!pool) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] flex flex-col items-center justify-center">
+        <p className="text-gray-400 mb-4">Pool not found</p>
+        <Link to="/pools">
+          <Button variant="outline">Back to Pools</Button>
+        </Link>
+      </div>
+    );
+  }
 
   const balance0 = isConnected ? getBalance(pool.token0.id) : 0;
   const balance1 = isConnected ? getBalance(pool.token1.id) : 0;
