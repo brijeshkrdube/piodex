@@ -153,7 +153,7 @@ const HomePage = () => {
           Built for all the ways you swap
         </h2>
         <p className="text-gray-400 text-center max-w-2xl mx-auto mb-12">
-          Whether you're a trader, liquidity provider, or developer — PioSwap has you covered.
+          Whether you&apos;re a trader, liquidity provider, or developer — PioSwap has you covered.
         </p>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
