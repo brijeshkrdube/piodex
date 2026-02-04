@@ -437,6 +437,7 @@ const PoolsPage = () => {
             <Button
               onClick={handleCreatePool}
               disabled={!token0 || !token1 || isCreating || createSuccess}
+              data-testid="submit-create-pool-btn"
               className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl disabled:opacity-50"
             >
               {createSuccess ? (
