@@ -62,7 +62,7 @@ export const WalletProvider = ({ children }) => {
       window.removeEventListener('walletChainChanged', handleChainChanged);
       window.removeEventListener('walletDisconnected', handleDisconnected);
     };
-  }, []);
+  }, [loadBalances]);
 
   // Load token balances
   const loadBalances = useCallback(async (walletAddress) => {
