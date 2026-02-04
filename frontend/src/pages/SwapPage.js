@@ -136,19 +136,18 @@ const SwapPage = () => {
     
     setIsSwapping(false);
   };
-    
-    setIsSwapping(false);
-    setSwapSuccess(true);
-    
-    setTimeout(() => {
-      setSwapSuccess(false);
-      setSellAmount('');
-    }, 3000);
-  };
 
   const sellBalance = isConnected ? getBalance(sellToken?.id) : 0;
   const buyBalance = isConnected ? getBalance(buyToken?.id) : 0;
   const insufficientBalance = parseFloat(sellAmount) > sellBalance;
+
+  if (tokens.length === 0) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] relative overflow-hidden">
