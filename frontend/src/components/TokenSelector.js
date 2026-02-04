@@ -115,11 +115,17 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
         fetchCustomToken(searchQuery);
       }, 500);
       return () => clearTimeout(timer);
-    } else {
+    }
+    return undefined;
+  }, [searchQuery, isContractAddress, fetchCustomToken]);
+
+  // Clear custom token info when search is not a contract address
+  useEffect(() => {
+    if (!isContractAddress) {
       setCustomTokenInfo(null);
       setCustomTokenError(null);
     }
-  }, [searchQuery, isContractAddress, fetchCustomToken]);
+  }, [isContractAddress]);
 
   const filteredTokens = useMemo(() => {
     return tokens.filter(token => {
