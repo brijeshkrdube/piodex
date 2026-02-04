@@ -53,104 +53,112 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
   useEffect(() => {
     if (!chartContainerRef.current || !token0 || !token1) return;
 
-    setLoading(true);
-
-    // Clean up previous chart
-    if (chartRef.current) {
-      chartRef.current.remove();
-      chartRef.current = null;
-    }
-
-    // Calculate base price from token prices
-    const basePrice = token0.price / token1.price;
+    let isMounted = true;
     
-    // Days based on timeframe
-    const daysMap = {
-      '1H': 1,
-      '1D': 30,
-      '1W': 90,
-      '1M': 180,
-      '1Y': 365
+    const initChart = () => {
+      if (!isMounted) return;
+      
+      // Clean up previous chart
+      if (chartRef.current) {
+        chartRef.current.remove();
+        chartRef.current = null;
+      }
+
+      // Calculate base price from token prices
+      const basePrice = token0.price / token1.price;
+      
+      // Days based on timeframe
+      const daysMap = {
+        '1H': 1,
+        '1D': 30,
+        '1W': 90,
+        '1M': 180,
+        '1Y': 365
+      };
+      
+      const days = daysMap[timeframe] || 30;
+      const priceData = generateMockPriceData(basePrice, days);
+      const volumeData = generateVolumeData(priceData);
+
+      // Calculate price change
+      if (priceData.length >= 2) {
+        const firstPrice = priceData[0].close;
+        const lastPrice = priceData[priceData.length - 1].close;
+        const change = ((lastPrice - firstPrice) / firstPrice) * 100;
+        setPriceChange(change);
+        setCurrentPrice(lastPrice);
+      }
+
+      // Create chart
+      const chart = createChart(chartContainerRef.current, {
+        width: chartContainerRef.current.clientWidth,
+        height: height,
+        layout: {
+          background: { type: ColorType.Solid, color: 'transparent' },
+          textColor: '#9ca3af'
+        },
+        grid: {
+          vertLines: { color: 'rgba(255, 255, 255, 0.05)' },
+          horzLines: { color: 'rgba(255, 255, 255, 0.05)' }
+        },
+        crosshair: {
+          mode: CrosshairMode.Normal,
+          vertLine: {
+            color: 'rgba(245, 158, 11, 0.5)',
+            width: 1,
+            style: 2
+          },
+          horzLine: {
+            color: 'rgba(245, 158, 11, 0.5)',
+            width: 1,
+            style: 2
+          }
+        },
+        rightPriceScale: {
+          borderColor: 'rgba(255, 255, 255, 0.1)'
+        },
+        timeScale: {
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+          timeVisible: true,
+          secondsVisible: false
+        }
+      });
+
+      // Add candlestick series
+      const candlestickSeries = chart.addCandlestickSeries({
+        upColor: '#22c55e',
+        downColor: '#ef4444',
+        borderDownColor: '#ef4444',
+        borderUpColor: '#22c55e',
+        wickDownColor: '#ef4444',
+        wickUpColor: '#22c55e'
+      });
+      candlestickSeries.setData(priceData);
+
+      // Add volume series
+      const volumeSeries = chart.addHistogramSeries({
+        color: '#26a69a',
+        priceFormat: {
+          type: 'volume'
+        },
+        priceScaleId: '',
+        scaleMargins: {
+          top: 0.8,
+          bottom: 0
+        }
+      });
+      volumeSeries.setData(volumeData);
+
+      // Fit content
+      chart.timeScale().fitContent();
+
+      chartRef.current = chart;
+      setLoading(false);
     };
     
-    const days = daysMap[timeframe] || 30;
-    const priceData = generateMockPriceData(basePrice, days);
-    const volumeData = generateVolumeData(priceData);
-
-    // Calculate price change
-    if (priceData.length >= 2) {
-      const firstPrice = priceData[0].close;
-      const lastPrice = priceData[priceData.length - 1].close;
-      const change = ((lastPrice - firstPrice) / firstPrice) * 100;
-      setPriceChange(change);
-      setCurrentPrice(lastPrice);
-    }
-
-    // Create chart
-    const chart = createChart(chartContainerRef.current, {
-      width: chartContainerRef.current.clientWidth,
-      height: height,
-      layout: {
-        background: { type: ColorType.Solid, color: 'transparent' },
-        textColor: '#9ca3af'
-      },
-      grid: {
-        vertLines: { color: 'rgba(255, 255, 255, 0.05)' },
-        horzLines: { color: 'rgba(255, 255, 255, 0.05)' }
-      },
-      crosshair: {
-        mode: CrosshairMode.Normal,
-        vertLine: {
-          color: 'rgba(245, 158, 11, 0.5)',
-          width: 1,
-          style: 2
-        },
-        horzLine: {
-          color: 'rgba(245, 158, 11, 0.5)',
-          width: 1,
-          style: 2
-        }
-      },
-      rightPriceScale: {
-        borderColor: 'rgba(255, 255, 255, 0.1)'
-      },
-      timeScale: {
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        timeVisible: true,
-        secondsVisible: false
-      }
-    });
-
-    // Add candlestick series
-    const candlestickSeries = chart.addCandlestickSeries({
-      upColor: '#22c55e',
-      downColor: '#ef4444',
-      borderDownColor: '#ef4444',
-      borderUpColor: '#22c55e',
-      wickDownColor: '#ef4444',
-      wickUpColor: '#22c55e'
-    });
-    candlestickSeries.setData(priceData);
-
-    // Add volume series
-    const volumeSeries = chart.addHistogramSeries({
-      color: '#26a69a',
-      priceFormat: {
-        type: 'volume'
-      },
-      priceScaleId: '',
-      scaleMargins: {
-        top: 0.8,
-        bottom: 0
-      }
-    });
-    volumeSeries.setData(volumeData);
-
-    // Fit content
-    chart.timeScale().fitContent();
-
-    chartRef.current = chart;
-    setLoading(false);
+    setLoading(true);
+    // Use requestAnimationFrame to avoid synchronous setState in effect
+    requestAnimationFrame(initChart);
 
     // Handle resize
     const handleResize = () => {
