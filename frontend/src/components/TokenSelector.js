@@ -13,19 +13,21 @@ import { Search, Loader2 } from 'lucide-react';
 
 const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeToken, tokens: propTokens }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [tokens, setTokens] = useState(propTokens || []);
+  const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(false);
   const { getBalance, isConnected } = useWallet();
 
   // Load tokens if not provided via props
   useEffect(() => {
-    if (propTokens && propTokens.length > 0) {
-      setTokens(propTokens);
-      return;
-    }
-    
     const loadTokens = async () => {
       if (!open) return;
+      
+      // Use prop tokens if available
+      if (propTokens && propTokens.length > 0) {
+        setTokens(propTokens);
+        return;
+      }
+      
       setLoading(true);
       try {
         const fetchedTokens = await getTokens();
