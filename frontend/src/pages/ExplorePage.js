@@ -1,30 +1,53 @@
-import React, { useState } from 'react';
-import { useWallet } from '../context/WalletContext';
-import { TOKENS, POOLS, formatCurrency } from '../data/mock';
+import React, { useState, useEffect } from 'react';
+import { formatCurrency } from '../data/mock';
+import { getTokens, getPools, getStats } from '../services/api';
 import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 import {
   Search,
   TrendingUp,
   TrendingDown,
   Star,
-  ExternalLink,
   ArrowUpRight,
   ArrowDownRight,
   Droplets,
   Activity,
-  BarChart3
+  Loader2
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const ExplorePage = () => {
+  const [tokens, setTokens] = useState([]);
+  const [pools, setPools] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('tokens');
   const [favorites, setFavorites] = useState([]);
 
-  const filteredTokens = TOKENS.filter(token => {
+  // Load data on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [fetchedTokens, fetchedPools, fetchedStats] = await Promise.all([
+          getTokens(),
+          getPools(),
+          getStats()
+        ]);
+        setTokens(fetchedTokens);
+        setPools(fetchedPools);
+        setStats(fetchedStats);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      }
+      setLoading(false);
+    };
+    loadData();
+  }, []);
+
+  const filteredTokens = tokens.filter(token => {
     const query = searchQuery.toLowerCase();
     return (
       token.symbol.toLowerCase().includes(query) ||
@@ -32,7 +55,7 @@ const ExplorePage = () => {
     );
   });
 
-  const filteredPools = POOLS.filter(pool => {
+  const filteredPools = pools.filter(pool => {
     const query = searchQuery.toLowerCase();
     return (
       pool.token0.symbol.toLowerCase().includes(query) ||
@@ -47,6 +70,14 @@ const ExplorePage = () => {
         : [...prev, tokenId]
     );
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] relative overflow-hidden">
