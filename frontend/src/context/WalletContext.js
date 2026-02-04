@@ -48,6 +48,7 @@ export const WalletProvider = ({ children }) => {
     setIsConnecting(false);
     
     return mockAddress;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const disconnectWallet = useCallback(() => {
