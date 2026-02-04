@@ -230,14 +230,20 @@ const SwapPage = () => {
                 onClick={() => setShowSellSelector(true)}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/15 transition-all"
               >
-                <img src={sellToken?.logo} alt={sellToken?.symbol} className="w-6 h-6 rounded-full" />
-                <span className="font-semibold text-white">{sellToken?.symbol}</span>
+                {sellToken ? (
+                  <>
+                    <img src={sellToken.logo} alt={sellToken.symbol} className="w-6 h-6 rounded-full" />
+                    <span className="font-semibold text-white">{sellToken.symbol}</span>
+                  </>
+                ) : (
+                  <span className="text-gray-400">Select</span>
+                )}
                 <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
             </div>
-            {sellAmount && (
+            {sellAmount && sellToken && (
               <div className="mt-2 text-sm text-gray-500">
-                ~${(parseFloat(sellAmount) * sellToken?.price || 0).toFixed(2)}
+                ~${(parseFloat(sellAmount) * sellToken.price).toFixed(2)}
               </div>
             )}
           </div>
