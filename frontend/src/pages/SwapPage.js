@@ -303,35 +303,54 @@ const SwapPage = () => {
 
             {/* Trade History */}
             <Card className="bg-[#1a1a1a] border-white/5 p-4 rounded-2xl">
-              <div className="flex items-center gap-2 mb-4">
-                <History className="w-5 h-5 text-amber-400" />
-                <h3 className="font-semibold text-white">Recent Trades</h3>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <History className="w-5 h-5 text-amber-400" />
+                  <h3 className="font-semibold text-white">Recent Trades</h3>
+                </div>
+                {recentTrades.length > 0 && recentTrades[0].isReal && (
+                  <span className="text-xs px-2 py-0.5 rounded bg-green-500/20 text-green-400">
+                    Live
+                  </span>
+                )}
               </div>
               
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-gray-400 border-b border-white/5">
-                      <th className="text-left py-2">Price ({buyToken?.symbol})</th>
-                      <th className="text-right py-2">Amount ({sellToken?.symbol})</th>
-                      <th className="text-right py-2">Total</th>
-                      <th className="text-right py-2">Time</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentTrades.map((trade) => (
-                      <tr key={trade.id} className="border-b border-white/5 hover:bg-white/5">
-                        <td className={`py-2 ${trade.type === 'buy' ? 'text-green-400' : 'text-red-400'}`}>
-                          {trade.price}
-                        </td>
-                        <td className="text-right text-white">{trade.amount}</td>
-                        <td className="text-right text-gray-400">{trade.total}</td>
-                        <td className="text-right text-gray-500">{trade.time}</td>
+              {recentTrades.length === 0 ? (
+                <div className="py-8 text-center">
+                  <History className="w-10 h-10 mx-auto mb-3 text-gray-600" />
+                  <p className="text-gray-400 text-sm">No trades yet for this pair</p>
+                  <p className="text-gray-500 text-xs mt-1">Make the first trade to see history here!</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="text-gray-400 border-b border-white/5">
+                        <th className="text-left py-2">Price ({buyToken?.symbol})</th>
+                        <th className="text-right py-2">Amount ({sellToken?.symbol})</th>
+                        <th className="text-right py-2">Total</th>
+                        <th className="text-right py-2">Time</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {recentTrades.map((trade) => (
+                        <tr 
+                          key={trade.id} 
+                          className="border-b border-white/5 hover:bg-white/5 cursor-pointer"
+                          onClick={() => trade.txHash && window.open(`https://pioscan.com/tx/${trade.txHash}`, '_blank')}
+                        >
+                          <td className={`py-2 ${trade.type === 'buy' ? 'text-green-400' : 'text-red-400'}`}>
+                            {trade.price}
+                          </td>
+                          <td className="text-right text-white">{trade.amount}</td>
+                          <td className="text-right text-gray-400">{trade.total}</td>
+                          <td className="text-right text-gray-500">{trade.time}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </Card>
           </div>
 
