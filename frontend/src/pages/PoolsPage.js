@@ -161,8 +161,6 @@ const PoolsPage = () => {
         setCreateSuccess(false);
         setToken0(null);
         setToken1(null);
-        setAmount0('');
-        setAmount1('');
         setTxHash(null);
         setPairAddress(null);
       }, 5000);
