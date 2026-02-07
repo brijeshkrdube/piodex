@@ -34,6 +34,12 @@ A decentralized exchange (DEX) clone of Uniswap, built for the PIOGOLD blockchai
 - Stores creator's wallet address for permission checks
 - Duplicate pairs cannot be created
 
+### Chart & Trade History
+- **Real data when available**: Shows "Live" badge and actual trade history
+- **Simulated fallback**: Shows "Simulated" badge when no real trades exist
+- All trades are recorded in MongoDB with transaction hashes
+- Trade history links to PioScan block explorer
+
 ---
 
 ## Core Requirements
@@ -45,33 +51,34 @@ A decentralized exchange (DEX) clone of Uniswap, built for the PIOGOLD blockchai
 - [x] Add/Remove liquidity (creator-only restriction)
 - [x] Real token balance display from blockchain
 - [x] Connect Wallet UI with network switching
+- [x] Real trade history (when trades are made)
+- [x] Real price chart (when trades are made)
 
 ### P1 - Implemented ✅
 - [x] Filter Explore page to only show tokens with active pools
 - [x] Token approval flow for swaps
 - [x] Transaction hash display with explorer links
 - [x] Creator-only liquidity management
+- [x] Simulated chart with fallback when no real trades
 
 ### P2 - Pending
 - [ ] Add more tokens as they are deployed (USDC, etc.)
 
 ---
 
-## What's Implemented
+## API Endpoints
 
-### Blockchain Integration
-- **Swap functionality** - Real on-chain swaps via Router contract
-- **Pool creation** - Creates pools on-chain via Factory contract
-- **Add Liquidity** - Creator-only, on-chain via Router
-- **Remove Liquidity** - Creator-only, tokens transferred to wallet
-- **Real Balances** - Fetches actual token balances from blockchain (no mocked values)
-- **Token approvals** - Handles ERC20 approvals before transactions
+### Swap
+- `POST /api/swap/quote` - Get swap quote
+- `POST /api/swap/execute` - Execute swap and record transaction
+- `GET /api/swap/trades/{token0}/{token1}` - Get real trade history
+- `GET /api/swap/price-history/{token0}/{token1}` - Get price history for charts
 
-### Backend APIs
-- `POST /api/pools` - Create pool with creator_address tracking
-- `POST /api/pools/add-liquidity` - Creator-only add liquidity
-- `POST /api/pools/remove-liquidity` - Creator-only remove liquidity
-- Pool responses include `creator_address` and `pair_address`
+### Pools
+- `GET /api/pools` - List all pools
+- `POST /api/pools` - Create pool with creator_address
+- `POST /api/pools/add-liquidity` - Add liquidity (creator only)
+- `POST /api/pools/remove-liquidity` - Remove liquidity (creator only)
 
 ---
 
@@ -82,6 +89,16 @@ A decentralized exchange (DEX) clone of Uniswap, built for the PIOGOLD blockchai
 | PIO (Native) | `0x0000...0000` | Active |
 | WPIO | `0x9Da12b8CF8B94f2E0eedD9841E268631aF03aDb1` | Active |
 | USDT | `0x75C681D7d00b6cDa3778535Bba87E433cA369C96` | Active |
+
+---
+
+## Testing Status (Feb 7, 2025)
+- ✅ Backend: 100% (11/11 tests passed)
+- ✅ Frontend: 100%
+- ✅ Chart shows "Simulated" badge when no real trades
+- ✅ Recent Trades shows "No trades yet" message
+- ✅ Pool creation checks for existing pairs
+- ✅ Creator-only liquidity restriction (403 for non-creators)
 
 ---
 
