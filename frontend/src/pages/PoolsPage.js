@@ -137,14 +137,14 @@ const PoolsPage = () => {
         setPairAddress(pairCreatedEvent.args.pair);
       }
       
-      // Also record in backend database (without liquidity - pool creation doesn't add liquidity)
+      // Also record in backend database with creator address
       try {
         await createPoolAPI(
           token0.address, 
           token1.address, 
           selectedFee.value,
-          0, // No initial liquidity - that's a separate "Add Liquidity" action
-          0
+          address, // Creator's wallet address
+          pairCreatedEvent?.args?.pair || null // On-chain pair address
         );
       } catch (dbError) {
         console.log('Backend sync failed, but pool created on-chain:', dbError);
