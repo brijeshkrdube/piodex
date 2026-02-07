@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createChart, ColorType, CrosshairMode, CandlestickSeries, HistogramSeries } from 'lightweight-charts';
+import { getPriceHistory } from '../services/api';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 
-// Generate mock price data for charts
-const generateMockPriceData = (basePrice, days = 30, volatility = 0.05) => {
+// Generate placeholder data when no real trades exist
+const generatePlaceholderData = (basePrice, days = 30, volatility = 0.02) => {
   const data = [];
   let currentPrice = basePrice;
   const now = Math.floor(Date.now() / 1000);
@@ -34,7 +35,7 @@ const generateMockPriceData = (basePrice, days = 30, volatility = 0.05) => {
 };
 
 // Generate volume data
-const generateVolumeData = (priceData, baseVolume = 100000) => {
+const generateVolumeData = (priceData, baseVolume = 10000) => {
   return priceData.map((item) => ({
     time: item.time,
     value: baseVolume * (0.5 + Math.random()),
@@ -49,13 +50,14 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
   const [loading, setLoading] = useState(true);
   const [priceChange, setPriceChange] = useState(0);
   const [currentPrice, setCurrentPrice] = useState(0);
+  const [hasRealData, setHasRealData] = useState(false);
 
   useEffect(() => {
     if (!chartContainerRef.current || !token0 || !token1) return;
 
     let isMounted = true;
     
-    const initChart = () => {
+    const initChart = async () => {
       if (!isMounted) return;
       
       // Clean up previous chart
@@ -64,9 +66,6 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
         chartRef.current = null;
       }
 
-      // Calculate base price from token prices
-      const basePrice = token0.price / token1.price;
-      
       // Days based on timeframe
       const daysMap = {
         '1H': 1,
@@ -77,8 +76,47 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
       };
       
       const days = daysMap[timeframe] || 30;
-      const priceData = generateMockPriceData(basePrice, days);
-      const volumeData = generateVolumeData(priceData);
+      
+      // Try to fetch real price history
+      let priceData = [];
+      let volumeData = [];
+      let realDataAvailable = false;
+      
+      try {
+        const history = await getPriceHistory(token0.address, token1.address, days);
+        
+        if (history.hasRealData && history.candles.length > 0) {
+          // Use real data
+          realDataAvailable = true;
+          priceData = history.candles.map(candle => ({
+            time: Math.floor(new Date(candle.time).getTime() / 1000),
+            open: candle.open,
+            high: candle.high,
+            low: candle.low,
+            close: candle.close
+          }));
+          volumeData = history.candles.map(candle => ({
+            time: Math.floor(new Date(candle.time).getTime() / 1000),
+            value: candle.volume * 1000,
+            color: candle.close >= candle.open ? 'rgba(34, 197, 94, 0.5)' : 'rgba(239, 68, 68, 0.5)'
+          }));
+        } else {
+          // No real trades - use placeholder with base price
+          const basePrice = history.basePrice || (token0.price / token1.price);
+          priceData = generatePlaceholderData(basePrice, days);
+          volumeData = generateVolumeData(priceData);
+        }
+      } catch (error) {
+        console.error('Error fetching price history:', error);
+        // Fallback to generated data
+        const basePrice = token0.price / token1.price;
+        priceData = generatePlaceholderData(basePrice, days);
+        volumeData = generateVolumeData(priceData);
+      }
+      
+      if (!isMounted) return;
+      
+      setHasRealData(realDataAvailable);
 
       // Calculate price change
       if (priceData.length >= 2) {
@@ -128,7 +166,7 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
         }
       });
 
-      // Add candlestick series (v5 API)
+      // Add candlestick series
       const candlestickSeries = chart.addSeries(CandlestickSeries, {
         upColor: '#22c55e',
         downColor: '#ef4444',
@@ -139,7 +177,7 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
       });
       candlestickSeries.setData(priceData);
 
-      // Add volume series (v5 API)
+      // Add volume series
       const volumeSeries = chart.addSeries(HistogramSeries, {
         color: '#26a69a',
         priceFormat: {
@@ -156,11 +194,8 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
       setLoading(false);
     };
     
-    // Use requestAnimationFrame to avoid synchronous setState in effect
-    requestAnimationFrame(() => {
-      setLoading(true);
-      requestAnimationFrame(initChart);
-    });
+    setLoading(true);
+    initChart();
 
     // Handle resize
     const handleResize = () => {
@@ -203,8 +238,18 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
             <img src={token1.logo} alt={token1.symbol} className="w-8 h-8 rounded-full border-2 border-[#1a1a1a]" />
           </div>
           <div>
-            <div className="font-semibold text-white">
+            <div className="font-semibold text-white flex items-center gap-2">
               {token0.symbol}/{token1.symbol}
+              {!hasRealData && (
+                <span className="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">
+                  Simulated
+                </span>
+              )}
+              {hasRealData && (
+                <span className="text-xs px-2 py-0.5 rounded bg-green-500/20 text-green-400">
+                  Live
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-2 text-sm">
               <span className="text-white font-medium">
@@ -236,6 +281,16 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
           ))}
         </div>
       </div>
+
+      {/* No real data notice */}
+      {!hasRealData && !loading && (
+        <div className="mb-4 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-amber-400" />
+          <span className="text-xs text-amber-200">
+            No real trades yet. Chart shows estimated price based on token values. Make trades to see real data!
+          </span>
+        </div>
+      )}
 
       {/* Chart Container */}
       <div className="relative">
