@@ -70,30 +70,35 @@ const SwapPage = () => {
     loadTokens();
   }, []);
 
-  // Generate mock recent trades
+  // Load real trade history
   useEffect(() => {
     if (sellToken && buyToken) {
-      const generateTrades = () => {
-        const mockTrades = [];
-        const now = Date.now();
-        for (let i = 0; i < 10; i++) {
-          const isBuy = Math.random() > 0.5;
-          const amount = (Math.random() * 1000 + 10).toFixed(2);
-          const price = (sellToken.price / buyToken.price * (0.99 + Math.random() * 0.02)).toFixed(6);
-          mockTrades.push({
-            id: i,
-            type: isBuy ? 'buy' : 'sell',
-            amount,
-            price,
-            total: (amount * price).toFixed(2),
-            time: new Date(now - i * 60000 * Math.random() * 10).toLocaleTimeString()
-          });
+      const loadTrades = async () => {
+        try {
+          const trades = await getTradeHistory(sellToken.address, buyToken.address, 20);
+          if (trades.length > 0) {
+            // Format real trades
+            const formattedTrades = trades.map((trade, index) => ({
+              id: trade.id || index,
+              type: trade.token0Amount > 0 ? 'sell' : 'buy',
+              amount: trade.token0Amount.toFixed(4),
+              price: trade.price.toFixed(6),
+              total: (trade.token0Amount * trade.price).toFixed(2),
+              time: trade.timestamp.toLocaleTimeString(),
+              txHash: trade.txHash,
+              isReal: true
+            }));
+            setRecentTrades(formattedTrades);
+          } else {
+            // No real trades - show placeholder message
+            setRecentTrades([]);
+          }
+        } catch (error) {
+          console.error('Error loading trade history:', error);
+          setRecentTrades([]);
         }
-        setRecentTrades(mockTrades);
       };
-      // Use timeout to avoid synchronous setState in effect
-      const timer = setTimeout(generateTrades, 0);
-      return () => clearTimeout(timer);
+      loadTrades();
     }
   }, [sellToken, buyToken]);
 
