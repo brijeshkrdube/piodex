@@ -38,6 +38,8 @@ class PoolBase(BaseModel):
 class PoolCreate(PoolBase):
     amount0: Optional[float] = 0.0
     amount1: Optional[float] = 0.0
+    creator_address: Optional[str] = None  # Wallet address of pool creator
+    pair_address: Optional[str] = None  # On-chain pair contract address
 
 
 class Pool(BaseModel):
@@ -50,6 +52,8 @@ class Pool(BaseModel):
     apr: float = 0.0
     token0_reserve: float = 0.0
     token1_reserve: float = 0.0
+    creator_address: Optional[str] = None  # Only creator can add/remove liquidity
+    pair_address: Optional[str] = None  # On-chain pair contract address
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     class Config:
@@ -66,6 +70,8 @@ class PoolResponse(BaseModel):
     apr: float
     token0_reserve: float
     token1_reserve: float
+    creator_address: Optional[str] = None
+    pair_address: Optional[str] = None
 
 
 # Position Models
