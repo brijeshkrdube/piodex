@@ -178,6 +178,45 @@ export const executeSwap = async (walletAddress, tokenIn, tokenOut, amountIn, am
   return response.data;
 };
 
+// Get trade history for a token pair
+export const getTradeHistory = async (token0Address, token1Address, limit = 50) => {
+  try {
+    const response = await apiClient.get(`/swap/trades/${token0Address}/${token1Address}?limit=${limit}`);
+    return response.data.map(trade => ({
+      id: trade.id,
+      type: trade.type,
+      token0Symbol: trade.token0_symbol,
+      token1Symbol: trade.token1_symbol,
+      token0Amount: trade.token0_amount,
+      token1Amount: trade.token1_amount,
+      txHash: trade.tx_hash,
+      walletAddress: trade.wallet_address,
+      timestamp: new Date(trade.timestamp),
+      price: trade.price
+    }));
+  } catch (error) {
+    console.error('Error fetching trade history:', error);
+    return [];
+  }
+};
+
+// Get price history for charting
+export const getPriceHistory = async (token0Address, token1Address, days = 30) => {
+  try {
+    const response = await apiClient.get(`/swap/price-history/${token0Address}/${token1Address}?days=${days}`);
+    return {
+      candles: response.data.candles || [],
+      basePrice: response.data.basePrice || 1,
+      token0Symbol: response.data.token0Symbol,
+      token1Symbol: response.data.token1Symbol,
+      hasRealData: response.data.hasRealData || false
+    };
+  } catch (error) {
+    console.error('Error fetching price history:', error);
+    return { candles: [], basePrice: 1, hasRealData: false };
+  }
+};
+
 // Transaction APIs
 export const getTransactions = async (walletAddress) => {
   const response = await apiClient.get(`/transactions/${walletAddress}`);
