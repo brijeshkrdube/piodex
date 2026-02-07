@@ -23,7 +23,7 @@ export const WalletProvider = ({ children }) => {
   // Track if auto-connect has run
   const hasAutoConnected = useRef(false);
 
-  // Load token balances
+  // Load REAL token balances from blockchain
   const loadBalances = useCallback(async (walletAddress) => {
     if (!walletAddress) return;
 
@@ -31,31 +31,36 @@ export const WalletProvider = ({ children }) => {
       // Get native PIO balance
       const nativeBalance = await web3Service.getNativeBalance(walletAddress);
       
-      // Mock balances for demo tokens (in production, fetch from blockchain)
-      const mockBalances = {
-        'pio': parseFloat(nativeBalance),
-        'wpio': parseFloat(nativeBalance) * 0.4,
-        'usdt': 5000.00,
-        'usdc': 3500.00,
-        'pgold': 10.5,
-        'peth': 2.35,
-        'pbtc': 0.15,
-        'pdai': 1000.00
+      // Fetch real balances from blockchain for each token
+      const realBalances = {
+        'pio': parseFloat(nativeBalance)
       };
       
-      setBalances(mockBalances);
+      // Token addresses on PIOGOLD
+      const tokenAddresses = {
+        'wpio': '0x9Da12b8CF8B94f2E0eedD9841E268631aF03aDb1',
+        'usdt': '0x75C681D7d00b6cDa3778535Bba87E433cA369C96'
+      };
+      
+      // Fetch real balances for each token
+      for (const [tokenId, tokenAddress] of Object.entries(tokenAddresses)) {
+        try {
+          const balance = await web3Service.getTokenBalance(tokenAddress, walletAddress);
+          realBalances[tokenId] = parseFloat(balance) || 0;
+        } catch (err) {
+          console.error(`Error fetching ${tokenId} balance:`, err);
+          realBalances[tokenId] = 0;
+        }
+      }
+      
+      setBalances(realBalances);
     } catch (err) {
       console.error('Error loading balances:', err);
-      // Fallback to mock balances
+      // Set zero balances on error - don't use fake values
       setBalances({
-        'pio': 1250.45,
-        'wpio': 500.00,
-        'usdt': 5000.00,
-        'usdc': 3500.00,
-        'pgold': 10.5,
-        'peth': 2.35,
-        'pbtc': 0.15,
-        'pdai': 1000.00
+        'pio': 0,
+        'wpio': 0,
+        'usdt': 0
       });
     }
   }, []);
