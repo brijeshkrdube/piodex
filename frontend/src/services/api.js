@@ -70,7 +70,9 @@ export const getPool = async (poolId) => {
     },
     volume24h: pool.volume_24h,
     token0Reserve: pool.token0_reserve,
-    token1Reserve: pool.token1_reserve
+    token1Reserve: pool.token1_reserve,
+    creatorAddress: pool.creator_address,
+    pairAddress: pool.pair_address
   };
 };
 
