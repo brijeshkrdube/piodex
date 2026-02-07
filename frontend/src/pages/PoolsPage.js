@@ -100,6 +100,12 @@ const PoolsPage = () => {
   const handleCreatePool = async () => {
     if (!token0 || !token1) return;
     
+    // Require wallet connection for pool creation
+    if (!isConnected) {
+      alert('Please connect your wallet to create a pool');
+      return;
+    }
+    
     setIsCreating(true);
     setTxHash(null);
     setPairAddress(null);
@@ -109,43 +115,45 @@ const PoolsPage = () => {
       const addr0 = token0.isNative ? CONTRACT_ADDRESSES.WPIO : token0.address;
       const addr1 = token1.isNative ? CONTRACT_ADDRESSES.WPIO : token1.address;
       
-      // Check if pair already exists on-chain
+      // Check if pair already exists on-chain FIRST
       const existingPair = await web3Service.getPairAddress(addr0, addr1);
       
       if (existingPair && existingPair !== ethers.constants.AddressZero) {
-        // Pair already exists, just add liquidity
+        // Pair already exists - don't allow creating again
         setPairAddress(existingPair);
-        alert(`Pool already exists at ${existingPair}. You can add liquidity to this pool.`);
+        alert(`This pool already exists!\n\nPair Address: ${existingPair}\n\nGo to "Add Liquidity" to add funds to this existing pool.`);
         setIsCreating(false);
         return;
       }
       
-      if (isConnected && useBlockchain) {
-        // Create pair on blockchain using Factory contract
-        const provider = web3Service.getProvider();
-        const signer = provider.getSigner();
-        const factory = new ethers.Contract(CONTRACT_ADDRESSES.FACTORY, FACTORY_ABI, signer);
-        
-        const tx = await factory.createPair(addr0, addr1);
-        setTxHash(tx.hash);
-        
-        const receipt = await tx.wait();
-        
-        // Get the new pair address from the event
-        const pairCreatedEvent = receipt.events?.find(e => e.event === 'PairCreated');
-        if (pairCreatedEvent) {
-          setPairAddress(pairCreatedEvent.args.pair);
-        }
+      // Create pair on blockchain using Factory contract
+      const provider = web3Service.getProvider();
+      const signer = provider.getSigner();
+      const factory = new ethers.Contract(CONTRACT_ADDRESSES.FACTORY, FACTORY_ABI, signer);
+      
+      const tx = await factory.createPair(addr0, addr1);
+      setTxHash(tx.hash);
+      
+      const receipt = await tx.wait();
+      
+      // Get the new pair address from the event
+      const pairCreatedEvent = receipt.events?.find(e => e.event === 'PairCreated');
+      if (pairCreatedEvent) {
+        setPairAddress(pairCreatedEvent.args.pair);
       }
       
-      // Also record in backend database
-      await createPoolAPI(
-        token0.address, 
-        token1.address, 
-        selectedFee.value,
-        parseFloat(amount0) || 0,
-        parseFloat(amount1) || 0
-      );
+      // Also record in backend database (without liquidity - pool creation doesn't add liquidity)
+      try {
+        await createPoolAPI(
+          token0.address, 
+          token1.address, 
+          selectedFee.value,
+          0, // No initial liquidity - that's a separate "Add Liquidity" action
+          0
+        );
+      } catch (dbError) {
+        console.log('Backend sync failed, but pool created on-chain:', dbError);
+      }
       
       setCreateSuccess(true);
       
