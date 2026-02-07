@@ -448,41 +448,15 @@ const PoolsPage = () => {
               </div>
             </div>
 
-            {/* Initial Liquidity */}
-            {token0 && token1 && (
-              <div className="space-y-3">
-                <label className="text-sm text-gray-400">Add Initial Liquidity</label>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5">
-                    <img src={token0.logo} alt={token0.symbol} className="w-6 h-6 rounded-full" />
-                    <span className="text-gray-400 w-16">{token0.symbol}</span>
-                    <input
-                      type="number"
-                      value={amount0}
-                      onChange={(e) => setAmount0(e.target.value)}
-                      placeholder="0.0"
-                      data-testid="amount0-input"
-                      className="flex-1 bg-transparent text-white text-right focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-white/5">
-                    <img src={token1.logo} alt={token1.symbol} className="w-6 h-6 rounded-full" />
-                    <span className="text-gray-400 w-16">{token1.symbol}</span>
-                    <input
-                      type="number"
-                      value={amount1}
-                      onChange={(e) => setAmount1(e.target.value)}
-                      placeholder="0.0"
-                      data-testid="amount1-input"
-                      className="flex-1 bg-transparent text-white text-right focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-                  </div>
+            {/* Info about pool creation */}
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-amber-200">
+                  <strong>Note:</strong> Creating a pool only initializes the trading pair on-chain. After creation, use "Add Liquidity" to deposit tokens into the pool.
                 </div>
-                <p className="text-xs text-gray-500">
-                  Initial liquidity determines the starting price ratio
-                </p>
               </div>
-            )}
+            </div>
 
             {/* Info about blockchain integration */}
             <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/30">
