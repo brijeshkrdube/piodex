@@ -48,10 +48,6 @@ const PoolsPage = () => {
   const [selectedFee, setSelectedFee] = useState(FEE_TIERS[2]);
   const [isCreating, setIsCreating] = useState(false);
   const [createSuccess, setCreateSuccess] = useState(false);
-  
-  // Initial liquidity amounts
-  const [amount0, setAmount0] = useState('');
-  const [amount1, setAmount1] = useState('');
   const [txHash, setTxHash] = useState(null);
   const [pairAddress, setPairAddress] = useState(null);
 
