@@ -72,13 +72,37 @@ export const getPool = async (poolId) => {
   };
 };
 
-export const createPool = async (token0Address, token1Address, fee, amount0 = 0, amount1 = 0) => {
+export const createPool = async (token0Address, token1Address, fee, creatorAddress = null, pairAddress = null) => {
   const response = await apiClient.post('/pools', {
     token0_address: token0Address,
     token1_address: token1Address,
     fee,
+    amount0: 0,
+    amount1: 0,
+    creator_address: creatorAddress,
+    pair_address: pairAddress
+  });
+  return response.data;
+};
+
+// Pool Liquidity APIs (only creator can add/remove)
+export const addPoolLiquidity = async (poolId, walletAddress, amount0, amount1, txHash = null) => {
+  const response = await apiClient.post('/pools/add-liquidity', {
+    pool_id: poolId,
+    wallet_address: walletAddress,
     amount0,
-    amount1
+    amount1,
+    tx_hash: txHash
+  });
+  return response.data;
+};
+
+export const removePoolLiquidity = async (poolId, walletAddress, percent = 100, txHash = null) => {
+  const response = await apiClient.post('/pools/remove-liquidity', {
+    pool_id: poolId,
+    wallet_address: walletAddress,
+    percent,
+    tx_hash: txHash
   });
   return response.data;
 };
