@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { ethers } from 'ethers';
 import { useWallet } from '../context/WalletContext';
-import { getPool, addLiquidity, removeLiquidity } from '../services/api';
+import { getPool, addPoolLiquidity, removePoolLiquidity } from '../services/api';
+import { web3Service, CONTRACT_ADDRESSES, ROUTER_ABI, ERC20_ABI } from '../services/web3';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -10,23 +12,17 @@ import {
   ArrowLeft,
   Plus,
   Minus,
-  Info,
   Loader2,
   Check,
   AlertTriangle,
-  Wallet
+  Wallet,
+  Lock,
+  ExternalLink
 } from 'lucide-react';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '../components/ui/tooltip';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 
 const AddLiquidityPage = () => {
   const { poolId } = useParams();
-  const navigate = useNavigate();
   const { isConnected, connectWallet, getBalance, isConnecting, address } = useWallet();
   
   const [pool, setPool] = useState(null);
@@ -37,8 +33,14 @@ const AddLiquidityPage = () => {
   const [removePercent, setRemovePercent] = useState([50]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [minPrice, setMinPrice] = useState('2.20');
-  const [maxPrice, setMaxPrice] = useState('2.80');
+  const [txHash, setTxHash] = useState(null);
+  const [needsApproval0, setNeedsApproval0] = useState(false);
+  const [needsApproval1, setNeedsApproval1] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+
+  // Check if current user is the pool creator
+  const isCreator = pool && address && 
+    pool.creatorAddress?.toLowerCase() === address.toLowerCase();
 
   // Load pool data
   useEffect(() => {
@@ -53,6 +55,39 @@ const AddLiquidityPage = () => {
     };
     loadPool();
   }, [poolId]);
+
+  // Check approvals when amounts change
+  useEffect(() => {
+    const checkApprovals = async () => {
+      if (!isConnected || !pool || !amount0 || !amount1) return;
+      
+      try {
+        // Check token0 approval (skip if native)
+        if (!pool.token0.isNative && pool.token0.address !== '0x0000000000000000000000000000000000000000') {
+          const allowance0 = await web3Service.checkAllowance(
+            pool.token0.address,
+            CONTRACT_ADDRESSES.ROUTER,
+            address
+          );
+          setNeedsApproval0(parseFloat(allowance0) < parseFloat(amount0));
+        }
+        
+        // Check token1 approval (skip if native)
+        if (!pool.token1.isNative && pool.token1.address !== '0x0000000000000000000000000000000000000000') {
+          const allowance1 = await web3Service.checkAllowance(
+            pool.token1.address,
+            CONTRACT_ADDRESSES.ROUTER,
+            address
+          );
+          setNeedsApproval1(parseFloat(allowance1) < parseFloat(amount1));
+        }
+      } catch (error) {
+        console.error('Error checking approvals:', error);
+      }
+    };
+    
+    checkApprovals();
+  }, [isConnected, pool, amount0, amount1, address]);
 
   if (loading) {
     return (
@@ -76,12 +111,12 @@ const AddLiquidityPage = () => {
   const balance0 = isConnected ? getBalance(pool.token0.id) : 0;
   const balance1 = isConnected ? getBalance(pool.token1.id) : 0;
   
-  const currentPrice = pool.token0.price / pool.token1.price;
+  const currentPrice = pool.token1.price > 0 ? pool.token0.price / pool.token1.price : 1;
 
   // Calculate amount1 based on amount0
   const handleAmount0Change = (value) => {
     setAmount0(value);
-    if (value && !isNaN(value)) {
+    if (value && !isNaN(value) && currentPrice > 0) {
       const calculated = parseFloat(value) * currentPrice;
       setAmount1(calculated.toFixed(6));
     } else {
@@ -92,7 +127,7 @@ const AddLiquidityPage = () => {
   // Calculate amount0 based on amount1
   const handleAmount1Change = (value) => {
     setAmount1(value);
-    if (value && !isNaN(value)) {
+    if (value && !isNaN(value) && currentPrice > 0) {
       const calculated = parseFloat(value) / currentPrice;
       setAmount0(calculated.toFixed(6));
     } else {
@@ -100,40 +135,204 @@ const AddLiquidityPage = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!isConnected || !address) return;
+  const handleApprove = async (tokenIndex) => {
+    if (!pool) return;
+    
+    setIsApproving(true);
+    try {
+      const tokenAddress = tokenIndex === 0 ? pool.token0.address : pool.token1.address;
+      await web3Service.approveTokenMax(tokenAddress, CONTRACT_ADDRESSES.ROUTER);
+      
+      if (tokenIndex === 0) {
+        setNeedsApproval0(false);
+      } else {
+        setNeedsApproval1(false);
+      }
+    } catch (error) {
+      console.error('Approval failed:', error);
+      alert('Approval failed: ' + error.message);
+    }
+    setIsApproving(false);
+  };
+
+  const handleAddLiquidity = async () => {
+    if (!isConnected || !address || !isCreator) return;
     
     setIsSubmitting(true);
+    setTxHash(null);
+    
     try {
-      if (activeTab === 'add') {
-        await addLiquidity(
-          pool.id,
-          address,
-          parseFloat(amount0),
-          parseFloat(amount1),
-          parseFloat(minPrice),
-          parseFloat(maxPrice)
+      // Get token addresses
+      const token0Addr = pool.token0.isNative ? CONTRACT_ADDRESSES.WPIO : pool.token0.address;
+      const token1Addr = pool.token1.isNative ? CONTRACT_ADDRESSES.WPIO : pool.token1.address;
+      
+      const decimals0 = pool.token0.decimals || 18;
+      const decimals1 = pool.token1.decimals || 18;
+      
+      const amount0Wei = ethers.utils.parseUnits(amount0, decimals0);
+      const amount1Wei = ethers.utils.parseUnits(amount1, decimals1);
+      
+      // Calculate minimum amounts (with 1% slippage)
+      const amount0Min = amount0Wei.mul(99).div(100);
+      const amount1Min = amount1Wei.mul(99).div(100);
+      
+      let result;
+      
+      if (pool.token0.isNative || pool.token1.isNative) {
+        // Use addLiquidityETH for native token pairs
+        const tokenAddr = pool.token0.isNative ? token1Addr : token0Addr;
+        const tokenAmount = pool.token0.isNative ? amount1Wei : amount0Wei;
+        const tokenMin = pool.token0.isNative ? amount1Min : amount0Min;
+        const ethAmount = pool.token0.isNative ? amount0Wei : amount1Wei;
+        const ethMin = pool.token0.isNative ? amount0Min : amount1Min;
+        
+        result = await web3Service.addLiquidityETH(
+          tokenAddr,
+          tokenAmount,
+          tokenMin,
+          ethMin,
+          ethAmount
         );
       } else {
-        // For remove, we'd need position ID - this is a simplified version
-        // In a real app, you'd fetch user's position first
+        // Use addLiquidity for token-token pairs
+        result = await web3Service.addLiquidity(
+          token0Addr,
+          token1Addr,
+          amount0Wei,
+          amount1Wei,
+          amount0Min,
+          amount1Min
+        );
       }
+      
+      setTxHash(result.hash);
+      
+      // Update backend
+      await addPoolLiquidity(
+        pool.id,
+        address,
+        parseFloat(amount0),
+        parseFloat(amount1),
+        result.hash
+      );
       
       setSubmitSuccess(true);
       setTimeout(() => {
         setSubmitSuccess(false);
         setAmount0('');
         setAmount1('');
-        navigate('/pools');
-      }, 2000);
+        setTxHash(null);
+      }, 5000);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Add liquidity failed:', error);
+      alert('Failed to add liquidity: ' + (error.reason || error.message));
+    }
+    setIsSubmitting(false);
+  };
+
+  const handleRemoveLiquidity = async () => {
+    if (!isConnected || !address || !isCreator) return;
+    
+    setIsSubmitting(true);
+    setTxHash(null);
+    
+    try {
+      const percent = removePercent[0];
+      
+      // Get LP token balance
+      if (pool.pairAddress) {
+        const lpBalance = await web3Service.getLPBalance(pool.pairAddress, address);
+        const lpToRemove = lpBalance.mul(percent).div(100);
+        
+        // Approve LP token spending if needed
+        const lpAllowance = await web3Service.checkAllowance(
+          pool.pairAddress,
+          CONTRACT_ADDRESSES.ROUTER,
+          address
+        );
+        
+        if (parseFloat(lpAllowance) < parseFloat(ethers.utils.formatEther(lpToRemove))) {
+          await web3Service.approveTokenMax(pool.pairAddress, CONTRACT_ADDRESSES.ROUTER);
+        }
+        
+        // Get token addresses
+        const token0Addr = pool.token0.isNative ? CONTRACT_ADDRESSES.WPIO : pool.token0.address;
+        const token1Addr = pool.token1.isNative ? CONTRACT_ADDRESSES.WPIO : pool.token1.address;
+        
+        let result;
+        
+        if (pool.token0.isNative || pool.token1.isNative) {
+          const tokenAddr = pool.token0.isNative ? token1Addr : token0Addr;
+          result = await web3Service.removeLiquidityETH(
+            tokenAddr,
+            lpToRemove,
+            0, // amountTokenMin (set to 0 for simplicity, should calculate properly)
+            0  // amountETHMin
+          );
+        } else {
+          result = await web3Service.removeLiquidity(
+            token0Addr,
+            token1Addr,
+            lpToRemove,
+            0,
+            0
+          );
+        }
+        
+        setTxHash(result.hash);
+        
+        // Update backend
+        await removePoolLiquidity(pool.id, address, percent, result.hash);
+      } else {
+        // No on-chain pair, just update backend
+        await removePoolLiquidity(pool.id, address, percent);
+      }
+      
+      setSubmitSuccess(true);
+      setTimeout(() => {
+        setSubmitSuccess(false);
+        setRemovePercent([50]);
+        setTxHash(null);
+      }, 5000);
+    } catch (error) {
+      console.error('Remove liquidity failed:', error);
+      alert('Failed to remove liquidity: ' + (error.reason || error.message));
     }
     setIsSubmitting(false);
   };
 
   const insufficientBalance0 = parseFloat(amount0) > balance0;
   const insufficientBalance1 = parseFloat(amount1) > balance1;
+
+  // Render not creator warning
+  const renderNotCreatorWarning = () => (
+    <div className="py-8 text-center space-y-4">
+      <Lock className="w-16 h-16 mx-auto text-red-400" />
+      <h3 className="text-xl font-bold text-white">Access Restricted</h3>
+      <p className="text-gray-400 max-w-sm mx-auto">
+        Only the pool creator can add or remove liquidity from this pool.
+      </p>
+      {pool.creatorAddress && (
+        <div className="bg-white/5 rounded-xl p-4 max-w-sm mx-auto">
+          <div className="text-sm text-gray-400 mb-1">Pool Creator</div>
+          <a 
+            href={`https://pioscan.com/address/${pool.creatorAddress}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-amber-400 hover:text-amber-300 flex items-center justify-center gap-1"
+          >
+            {pool.creatorAddress.slice(0, 10)}...{pool.creatorAddress.slice(-8)}
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        </div>
+      )}
+      <Link to="/pools">
+        <Button variant="outline" className="mt-4">
+          Back to Pools
+        </Button>
+      </Link>
+    </div>
+  );
 
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] relative overflow-hidden">
@@ -173,10 +372,29 @@ const AddLiquidityPage = () => {
             </h1>
             <div className="flex items-center gap-2 text-sm text-gray-400">
               <span className="px-2 py-0.5 rounded bg-white/10">{pool.fee}% fee</span>
-              <span>APR: <span className="text-green-400">{pool.apr}%</span></span>
+              <span>TVL: <span className="text-green-400">${pool.tvl?.toFixed(2) || '0.00'}</span></span>
             </div>
           </div>
         </div>
+
+        {/* Creator Badge */}
+        {isConnected && (
+          <div className={`mb-4 p-3 rounded-xl ${isCreator ? 'bg-green-500/10 border border-green-500/30' : 'bg-red-500/10 border border-red-500/30'}`}>
+            <div className="flex items-center gap-2">
+              {isCreator ? (
+                <>
+                  <Check className="w-5 h-5 text-green-400" />
+                  <span className="text-green-200 text-sm">You are the pool creator - you can manage liquidity</span>
+                </>
+              ) : (
+                <>
+                  <Lock className="w-5 h-5 text-red-400" />
+                  <span className="text-red-200 text-sm">Only the pool creator can manage liquidity</span>
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Main Card */}
         <Card className="bg-[#1a1a1a] border-white/5 rounded-2xl overflow-hidden">
@@ -212,6 +430,8 @@ const AddLiquidityPage = () => {
                     {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                   </Button>
                 </div>
+              ) : !isCreator ? (
+                renderNotCreatorWarning()
               ) : (
                 <>
                   {/* Token 0 Input */}
@@ -285,62 +505,56 @@ const AddLiquidityPage = () => {
                     )}
                   </div>
 
-                  {/* Price Range */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-400 flex items-center gap-1">
-                        Set Price Range
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Info className="w-3 h-3" />
-                            </TooltipTrigger>
-                            <TooltipContent className="bg-[#2a2a2a] border-white/10">
-                              <p className="text-xs max-w-xs">Your liquidity will only earn fees when the market price is within your specified range</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </span>
-                      <span className="text-sm text-gray-400">
-                        Current: {currentPrice.toFixed(4)} {pool.token1.symbol}/{pool.token0.symbol}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-white/5 rounded-xl p-4">
-                        <label className="text-sm text-gray-400 mb-2 block">Min Price</label>
-                        <Input
-                          type="number"
-                          value={minPrice}
-                          onChange={(e) => setMinPrice(e.target.value)}
-                          className="bg-transparent border-none text-lg font-medium text-white focus-visible:ring-0 p-0"
-                        />
-                        <div className="text-xs text-gray-500 mt-1">
-                          {pool.token1.symbol} per {pool.token0.symbol}
-                        </div>
-                      </div>
-                      <div className="bg-white/5 rounded-xl p-4">
-                        <label className="text-sm text-gray-400 mb-2 block">Max Price</label>
-                        <Input
-                          type="number"
-                          value={maxPrice}
-                          onChange={(e) => setMaxPrice(e.target.value)}
-                          className="bg-transparent border-none text-lg font-medium text-white focus-visible:ring-0 p-0"
-                        />
-                        <div className="text-xs text-gray-500 mt-1">
-                          {pool.token1.symbol} per {pool.token0.symbol}
-                        </div>
+                  {/* Transaction Hash */}
+                  {txHash && (
+                    <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30">
+                      <div className="text-sm text-blue-200">
+                        <strong>Transaction:</strong>{' '}
+                        <a 
+                          href={`https://pioscan.com/tx/${txHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 underline"
+                        >
+                          {txHash.slice(0, 20)}...
+                        </a>
                       </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* Approval Buttons */}
+                  {needsApproval0 && (
+                    <Button
+                      onClick={() => handleApprove(0)}
+                      disabled={isApproving}
+                      className="w-full py-4 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 rounded-xl"
+                    >
+                      {isApproving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                      Approve {pool.token0.symbol}
+                    </Button>
+                  )}
+                  
+                  {needsApproval1 && (
+                    <Button
+                      onClick={() => handleApprove(1)}
+                      disabled={isApproving}
+                      className="w-full py-4 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 rounded-xl"
+                    >
+                      {isApproving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                      Approve {pool.token1.symbol}
+                    </Button>
+                  )}
 
                   {/* Submit Button */}
                   <Button
-                    onClick={handleSubmit}
+                    onClick={handleAddLiquidity}
                     disabled={
                       !amount0 ||
                       !amount1 ||
                       insufficientBalance0 ||
                       insufficientBalance1 ||
+                      needsApproval0 ||
+                      needsApproval1 ||
                       isSubmitting ||
                       submitSuccess
                     }
@@ -376,6 +590,8 @@ const AddLiquidityPage = () => {
                     {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                   </Button>
                 </div>
+              ) : !isCreator ? (
+                renderNotCreatorWarning()
               ) : (
                 <>
                   {/* Amount to Remove */}
@@ -410,14 +626,14 @@ const AddLiquidityPage = () => {
 
                   {/* Preview */}
                   <div className="bg-white/5 rounded-xl p-4 space-y-3">
-                    <div className="text-sm text-gray-400">You will receive</div>
+                    <div className="text-sm text-gray-400">You will receive (estimated)</div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <img src={pool.token0.logo} alt={pool.token0.symbol} className="w-6 h-6 rounded-full" />
                         <span className="text-white">{pool.token0.symbol}</span>
                       </div>
                       <span className="text-white font-medium">
-                        {((1000 * removePercent[0]) / 100).toFixed(4)}
+                        {((pool.token0Reserve || 0) * removePercent[0] / 100).toFixed(4)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
@@ -426,14 +642,38 @@ const AddLiquidityPage = () => {
                         <span className="text-white">{pool.token1.symbol}</span>
                       </div>
                       <span className="text-white font-medium">
-                        {((2450 * removePercent[0]) / 100).toFixed(4)}
+                        {((pool.token1Reserve || 0) * removePercent[0] / 100).toFixed(4)}
                       </span>
                     </div>
                   </div>
 
+                  {/* Info */}
+                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                    <div className="text-sm text-amber-200">
+                      Tokens will be transferred to your wallet: {address?.slice(0, 10)}...
+                    </div>
+                  </div>
+
+                  {/* Transaction Hash */}
+                  {txHash && (
+                    <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30">
+                      <div className="text-sm text-blue-200">
+                        <strong>Transaction:</strong>{' '}
+                        <a 
+                          href={`https://pioscan.com/tx/${txHash}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:text-blue-300 underline"
+                        >
+                          {txHash.slice(0, 20)}...
+                        </a>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Submit Button */}
                   <Button
-                    onClick={handleSubmit}
+                    onClick={handleRemoveLiquidity}
                     disabled={removePercent[0] === 0 || isSubmitting || submitSuccess}
                     className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-400 hover:to-orange-400 text-white rounded-xl disabled:opacity-50"
                   >
