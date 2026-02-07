@@ -174,36 +174,14 @@ const PoolsPage = () => {
     } catch (error) {
       console.error('Error creating pool:', error);
       
-      // If blockchain fails, try database-only mode
       if (error.code === 4001) {
         alert('Transaction rejected by user');
       } else if (error.reason) {
         alert(`Failed to create pool: ${error.reason}`);
+      } else if (error.message?.includes('Pair exists')) {
+        alert('This pool already exists on the blockchain!');
       } else {
-        // Fallback to database only
-        try {
-          await createPoolAPI(
-            token0.address, 
-            token1.address, 
-            selectedFee.value,
-            parseFloat(amount0) || 0,
-            parseFloat(amount1) || 0
-          );
-          setCreateSuccess(true);
-          const fetchedPools = await getPools();
-          setPools(fetchedPools);
-          
-          setTimeout(() => {
-            setShowCreatePool(false);
-            setCreateSuccess(false);
-            setToken0(null);
-            setToken1(null);
-            setAmount0('');
-            setAmount1('');
-          }, 2000);
-        } catch (dbError) {
-          alert(dbError.response?.data?.detail || 'Failed to create pool');
-        }
+        alert(`Failed to create pool: ${error.message || 'Unknown error'}`);
       }
     }
     setIsCreating(false);
