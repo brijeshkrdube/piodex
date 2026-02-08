@@ -64,7 +64,7 @@ const Header = () => {
             <img 
               src="/logo.png" 
               alt="PioSwap" 
-              className="w-10 h-10 object-contain"
+              className="w-12 h-12 sm:w-14 sm:h-14 object-contain"
             />
           </Link>
 
