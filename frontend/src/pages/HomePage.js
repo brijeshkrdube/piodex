@@ -54,7 +54,7 @@ const HomePage = () => {
     <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-amber-500/5 rounded-full blur-[150px]" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-orange-500/5 rounded-full blur-[150px]" />
         <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-orange-500/3 rounded-full blur-[130px]" />
       </div>
 
@@ -76,7 +76,7 @@ const HomePage = () => {
       {/* Hero Section */}
       <section className="relative z-10 max-w-6xl mx-auto px-4 pt-20 pb-24">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-amber-500/20 text-orange-400 text-sm font-medium mb-6">
             <Zap className="w-4 h-4" />
             Powered by PIOGOLD Network
           </div>
@@ -91,7 +91,7 @@ const HomePage = () => {
             <Link to="/swap">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-xl px-8 py-6 text-lg gap-2 group"
+                className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-xl px-8 py-6 text-lg gap-2 group"
               >
                 Start Trading
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -141,7 +141,7 @@ const HomePage = () => {
               </div>
             </div>
             <Link to="/swap">
-              <Button className="w-full py-5 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl">
+              <Button className="w-full py-5 text-lg font-semibold bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl">
                 Get started
               </Button>
             </Link>
@@ -199,13 +199,13 @@ const HomePage = () => {
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mb-4">
                 <ArrowLeftRight className="w-6 h-6 text-black" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
+              <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-400 transition-colors">
                 Instant Swaps
               </h3>
               <p className="text-gray-400 mb-4">
                 Swap tokens instantly with deep liquidity and competitive rates. Zero platform fees.
               </p>
-              <span className="text-amber-400 flex items-center gap-1">
+              <span className="text-orange-400 flex items-center gap-1">
                 Start swapping <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </span>
             </Card>
@@ -251,8 +251,8 @@ const HomePage = () => {
         {/* Trust Features */}
         <div className="grid md:grid-cols-3 gap-6 mt-12">
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-xl bg-amber-500/10">
-              <Shield className="w-6 h-6 text-amber-400" />
+            <div className="p-3 rounded-xl bg-orange-500/10">
+              <Shield className="w-6 h-6 text-orange-400" />
             </div>
             <div>
               <h4 className="text-white font-semibold mb-1">Secure & Audited</h4>
