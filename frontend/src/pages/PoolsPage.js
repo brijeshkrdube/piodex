@@ -187,7 +187,7 @@ const PoolsPage = () => {
   if (loading) {
     return (
       <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
       </div>
     );
   }
@@ -196,7 +196,7 @@ const PoolsPage = () => {
     <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-40 left-1/3 w-[600px] h-[600px] bg-amber-500/3 rounded-full blur-[150px]" />
+        <div className="absolute top-40 left-1/3 w-[600px] h-[600px] bg-cyan-500/3 rounded-full blur-[150px]" />
         <div className="absolute bottom-40 right-1/3 w-[500px] h-[500px] bg-orange-500/3 rounded-full blur-[130px]" />
       </div>
 
@@ -210,7 +210,7 @@ const PoolsPage = () => {
           <Button
             onClick={() => setShowCreatePool(true)}
             data-testid="create-pool-btn"
-            className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-xl gap-2"
+            className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-xl gap-2"
           >
             <Plus className="w-4 h-4" />
             New Position
@@ -225,20 +225,20 @@ const PoolsPage = () => {
               placeholder="Search pools by token name or symbol"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-amber-500/50 rounded-xl"
+              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-cyan-500/50 rounded-xl"
             />
           </div>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
             <TabsList className="bg-white/5 border border-white/10 rounded-xl p-1">
               <TabsTrigger
                 value="all"
-                className="rounded-lg data-[state=active]:bg-amber-500 data-[state=active]:text-black"
+                className="rounded-lg data-[state=active]:bg-cyan-500 data-[state=active]:text-black"
               >
                 All Pools
               </TabsTrigger>
               <TabsTrigger
                 value="my"
-                className="rounded-lg data-[state=active]:bg-amber-500 data-[state=active]:text-black"
+                className="rounded-lg data-[state=active]:bg-cyan-500 data-[state=active]:text-black"
               >
                 My Positions
               </TabsTrigger>
@@ -312,7 +312,7 @@ const PoolsPage = () => {
                     <Link to={`/pool/${pool.id}/add`}>
                       <Button
                         size="sm"
-                        className="bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 rounded-lg"
+                        className="bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 rounded-lg"
                       >
                         <Plus className="w-4 h-4" />
                       </Button>
@@ -336,8 +336,8 @@ const PoolsPage = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
           <Card className="bg-[#1a1a1a] border-white/5 p-6 rounded-2xl">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-xl bg-amber-500/10">
-                <Droplets className="w-5 h-5 text-amber-400" />
+              <div className="p-2 rounded-xl bg-cyan-500/10">
+                <Droplets className="w-5 h-5 text-cyan-400" />
               </div>
               <span className="text-gray-400">Total Value Locked</span>
             </div>
@@ -431,7 +431,7 @@ const PoolsPage = () => {
                     onClick={() => setSelectedFee(tier)}
                     className={`p-4 rounded-xl border transition-all text-left ${
                       selectedFee.value === tier.value
-                        ? 'bg-amber-500/10 border-amber-500/50'
+                        ? 'bg-cyan-500/10 border-cyan-500/50'
                         : 'bg-white/5 border-white/10 hover:bg-white/10'
                     }`}
                   >
@@ -443,9 +443,9 @@ const PoolsPage = () => {
             </div>
 
             {/* Info about pool creation */}
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+            <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30">
               <div className="flex items-start gap-2">
-                <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-amber-200">
                   <strong>Note:</strong> Creating a pool only initializes the trading pair on-chain. After creation, use "Add Liquidity" to deposit tokens into the pool.
                 </div>
@@ -497,7 +497,7 @@ const PoolsPage = () => {
               onClick={handleCreatePool}
               disabled={!token0 || !token1 || isCreating || createSuccess}
               data-testid="submit-create-pool-btn"
-              className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl disabled:opacity-50"
+              className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl disabled:opacity-50"
             >
               {createSuccess ? (
                 <><Check className="w-5 h-5 mr-2" /> Pool Created!</>
