@@ -66,7 +66,6 @@ const Header = () => {
               alt="PioSwap" 
               className="w-10 h-10 object-contain"
             />
-            <span className="text-xl font-bold text-white hidden sm:block">PioSwap</span>
           </Link>
 
           {/* Desktop Navigation */}
