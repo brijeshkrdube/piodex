@@ -86,7 +86,7 @@ const ExplorePage = () => {
   if (loading) {
     return (
       <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
       </div>
     );
   }
@@ -95,7 +95,7 @@ const ExplorePage = () => {
     <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-40 left-1/4 w-[600px] h-[600px] bg-amber-500/3 rounded-full blur-[150px]" />
+        <div className="absolute top-40 left-1/4 w-[600px] h-[600px] bg-cyan-500/3 rounded-full blur-[150px]" />
         <div className="absolute bottom-20 right-1/3 w-[500px] h-[500px] bg-orange-500/3 rounded-full blur-[130px]" />
       </div>
 
@@ -150,21 +150,21 @@ const ExplorePage = () => {
               placeholder="Search tokens or pools"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-amber-500/50 rounded-xl"
+              className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-cyan-500/50 rounded-xl"
             />
           </div>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full sm:w-auto">
             <TabsList className="bg-white/5 border border-white/10 rounded-xl p-1">
               <TabsTrigger
                 value="tokens"
-                className="rounded-lg data-[state=active]:bg-amber-500 data-[state=active]:text-black gap-2"
+                className="rounded-lg data-[state=active]:bg-cyan-500 data-[state=active]:text-black gap-2"
               >
                 <Activity className="w-4 h-4" />
                 Tokens
               </TabsTrigger>
               <TabsTrigger
                 value="pools"
-                className="rounded-lg data-[state=active]:bg-amber-500 data-[state=active]:text-black gap-2"
+                className="rounded-lg data-[state=active]:bg-cyan-500 data-[state=active]:text-black gap-2"
               >
                 <Droplets className="w-4 h-4" />
                 Pools
@@ -200,10 +200,10 @@ const ExplorePage = () => {
                   <div className="col-span-4 flex items-center gap-3">
                     <button
                       onClick={() => toggleFavorite(token.id)}
-                      className="text-gray-500 hover:text-amber-400 transition-colors"
+                      className="text-gray-500 hover:text-cyan-400 transition-colors"
                     >
                       <Star
-                        className={`w-4 h-4 ${favorites.includes(token.id) ? 'fill-amber-400 text-amber-400' : ''}`}
+                        className={`w-4 h-4 ${favorites.includes(token.id) ? 'fill-amber-400 text-cyan-400' : ''}`}
                       />
                     </button>
                     <img
@@ -250,7 +250,7 @@ const ExplorePage = () => {
                     <Link to="/swap">
                       <Button
                         size="sm"
-                        className="bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 rounded-lg"
+                        className="bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 rounded-lg"
                       >
                         Trade
                       </Button>
@@ -327,7 +327,7 @@ const ExplorePage = () => {
                     <Link to={`/pool/${pool.id}/add`}>
                       <Button
                         size="sm"
-                        className="bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 rounded-lg"
+                        className="bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 rounded-lg"
                       >
                         Add
                       </Button>
@@ -342,7 +342,7 @@ const ExplorePage = () => {
         {/* Trending Section */}
         <div className="mt-8">
           <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-amber-400" />
+            <TrendingUp className="w-5 h-5 text-cyan-400" />
             Trending on PioSwap
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -371,7 +371,7 @@ const ExplorePage = () => {
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="opacity-0 group-hover:opacity-100 text-amber-400 hover:text-amber-300 transition-all"
+                      className="opacity-0 group-hover:opacity-100 text-cyan-400 hover:text-amber-300 transition-all"
                     >
                       Trade <ArrowUpRight className="w-3 h-3 ml-1" />
                     </Button>
