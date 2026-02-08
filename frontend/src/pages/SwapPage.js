@@ -281,7 +281,7 @@ const SwapPage = () => {
   if (tokens.length === 0) {
     return (
       <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
       </div>
     );
   }
@@ -290,7 +290,7 @@ const SwapPage = () => {
     <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[120px]" />
+        <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-20 right-1/4 w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[100px]" />
       </div>
 
@@ -305,7 +305,7 @@ const SwapPage = () => {
             <Card className="bg-[#1a1a1a] border-white/5 p-4 rounded-2xl">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <History className="w-5 h-5 text-amber-400" />
+                  <History className="w-5 h-5 text-cyan-400" />
                   <h3 className="font-semibold text-white">Recent Trades</h3>
                 </div>
                 {recentTrades.length > 0 && recentTrades[0].isReal && (
@@ -362,13 +362,13 @@ const SwapPage = () => {
                 <TabsList className="bg-white/5 border border-white/10 rounded-xl p-1">
                   <TabsTrigger
                     value="swap"
-                    className="rounded-lg data-[state=active]:bg-amber-500 data-[state=active]:text-black px-4"
+                    className="rounded-lg data-[state=active]:bg-cyan-500 data-[state=active]:text-black px-4"
                   >
                     Swap
                   </TabsTrigger>
                   <TabsTrigger
                     value="limit"
-                    className="rounded-lg data-[state=active]:bg-amber-500 data-[state=active]:text-black px-4"
+                    className="rounded-lg data-[state=active]:bg-cyan-500 data-[state=active]:text-black px-4"
                   >
                     Limit
                   </TabsTrigger>
@@ -393,7 +393,7 @@ const SwapPage = () => {
                             onClick={() => setSlippage(value)}
                             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
                               slippage === value
-                                ? 'bg-amber-500 text-black'
+                                ? 'bg-cyan-500 text-black'
                                 : 'bg-white/5 text-white hover:bg-white/10'
                             }`}
                           >
@@ -425,10 +425,10 @@ const SwapPage = () => {
                   {isConnected && (
                     <button
                       onClick={handleMaxClick}
-                      className="text-sm text-gray-400 hover:text-amber-400 transition-colors"
+                      className="text-sm text-gray-400 hover:text-cyan-400 transition-colors"
                     >
                       Balance: {sellBalance.toFixed(4)}
-                      <span className="ml-1 text-amber-400">MAX</span>
+                      <span className="ml-1 text-cyan-400">MAX</span>
                     </button>
                   )}
                 </div>
@@ -466,7 +466,7 @@ const SwapPage = () => {
               <div className="relative h-0 flex justify-center">
                 <button
                   onClick={handleSwapTokens}
-                  className="absolute -top-4 z-10 p-2 rounded-xl bg-[#1a1a1a] border-4 border-[#0d0d0d] text-gray-400 hover:text-amber-400 hover:rotate-180 transition-all duration-300"
+                  className="absolute -top-4 z-10 p-2 rounded-xl bg-[#1a1a1a] border-4 border-[#0d0d0d] text-gray-400 hover:text-cyan-400 hover:rotate-180 transition-all duration-300"
                 >
                   <ArrowDownUp className="w-5 h-5" />
                 </button>
@@ -541,7 +541,7 @@ const SwapPage = () => {
                         </Tooltip>
                       </TooltipProvider>
                     </span>
-                    <span className={priceImpact > 1 ? 'text-amber-400' : 'text-green-400'}>
+                    <span className={priceImpact > 1 ? 'text-cyan-400' : 'text-green-400'}>
                       {priceImpact}%
                     </span>
                   </div>
@@ -558,7 +558,7 @@ const SwapPage = () => {
                   <Button
                     onClick={connectWallet}
                     disabled={isConnecting}
-                    className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl"
+                    className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl"
                   >
                     {isConnecting ? (
                       <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Connecting...</>
@@ -569,7 +569,7 @@ const SwapPage = () => {
                 ) : !isCorrectNetwork ? (
                   <Button
                     onClick={switchNetwork}
-                    className="w-full py-6 text-lg font-semibold bg-amber-500/20 text-amber-400 rounded-xl"
+                    className="w-full py-6 text-lg font-semibold bg-cyan-500/20 text-cyan-400 rounded-xl"
                   >
                     <AlertTriangle className="w-5 h-5 mr-2" />
                     Switch to PIOGOLD Network
@@ -593,7 +593,7 @@ const SwapPage = () => {
                   <Button
                     onClick={handleApprove}
                     disabled={isApproving}
-                    className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl"
+                    className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl"
                   >
                     {isApproving ? (
                       <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Approving...</>
@@ -615,7 +615,7 @@ const SwapPage = () => {
                         href={`https://pioscan.com/tx/${txHash}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="block text-center text-sm text-amber-400 hover:text-amber-300"
+                        className="block text-center text-sm text-cyan-400 hover:text-amber-300"
                       >
                         View on Explorer →
                       </a>
@@ -625,7 +625,7 @@ const SwapPage = () => {
                   <Button
                     onClick={handleSwap}
                     disabled={isSwapping}
-                    className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl"
+                    className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl"
                   >
                     {isSwapping ? (
                       <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Swapping...</>
