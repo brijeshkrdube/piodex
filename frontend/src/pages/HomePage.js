@@ -289,9 +289,8 @@ const HomePage = () => {
                 <img 
                   src="/logo.png" 
                   alt="PioSwap" 
-                  className="w-10 h-10 object-contain"
+                  className="w-12 h-12 object-contain"
                 />
-                <span className="text-lg font-bold text-white">PioSwap</span>
               </div>
               <p className="text-gray-400 text-sm">
                 The leading DEX on PIOGOLD network. Trade, earn, and build.
