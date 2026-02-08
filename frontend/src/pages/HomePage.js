@@ -286,9 +286,11 @@ const HomePage = () => {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                  <span className="text-black font-bold">P</span>
-                </div>
+                <img 
+                  src="/logo.png" 
+                  alt="PioSwap" 
+                  className="w-10 h-10 object-contain"
+                />
                 <span className="text-lg font-bold text-white">PioSwap</span>
               </div>
               <p className="text-gray-400 text-sm">
