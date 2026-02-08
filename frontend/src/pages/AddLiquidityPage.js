@@ -92,7 +92,7 @@ const AddLiquidityPage = () => {
   if (loading) {
     return (
       <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
       </div>
     );
   }
@@ -319,7 +319,7 @@ const AddLiquidityPage = () => {
             href={`https://pioscan.com/address/${pool.creatorAddress}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-amber-400 hover:text-amber-300 flex items-center justify-center gap-1"
+            className="text-cyan-400 hover:text-amber-300 flex items-center justify-center gap-1"
           >
             {pool.creatorAddress.slice(0, 10)}...{pool.creatorAddress.slice(-8)}
             <ExternalLink className="w-3 h-3" />
@@ -338,7 +338,7 @@ const AddLiquidityPage = () => {
     <div className="min-h-[calc(100vh-64px)] bg-[#0d0d0d] relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-[120px]" />
+        <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[120px]" />
         <div className="absolute bottom-20 right-1/4 w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[100px]" />
       </div>
 
@@ -402,14 +402,14 @@ const AddLiquidityPage = () => {
             <TabsList className="w-full bg-transparent border-b border-white/5 rounded-none p-0">
               <TabsTrigger
                 value="add"
-                className="flex-1 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-amber-500 data-[state=active]:text-amber-400 data-[state=active]:bg-transparent"
+                className="flex-1 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-amber-500 data-[state=active]:text-cyan-400 data-[state=active]:bg-transparent"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Liquidity
               </TabsTrigger>
               <TabsTrigger
                 value="remove"
-                className="flex-1 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-amber-500 data-[state=active]:text-amber-400 data-[state=active]:bg-transparent"
+                className="flex-1 py-4 rounded-none border-b-2 border-transparent data-[state=active]:border-amber-500 data-[state=active]:text-cyan-400 data-[state=active]:bg-transparent"
               >
                 <Minus className="w-4 h-4 mr-2" />
                 Remove Liquidity
@@ -425,7 +425,7 @@ const AddLiquidityPage = () => {
                   <Button
                     onClick={connectWallet}
                     disabled={isConnecting}
-                    className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-xl"
+                    className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-xl"
                   >
                     {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                   </Button>
@@ -440,10 +440,10 @@ const AddLiquidityPage = () => {
                       <span className="text-sm text-gray-400">Deposit {pool.token0.symbol}</span>
                       <button
                         onClick={() => handleAmount0Change(balance0.toString())}
-                        className="text-sm text-gray-400 hover:text-amber-400 transition-colors"
+                        className="text-sm text-gray-400 hover:text-cyan-400 transition-colors"
                       >
                         Balance: {balance0.toFixed(4)}
-                        <span className="ml-1 text-amber-400">MAX</span>
+                        <span className="ml-1 text-cyan-400">MAX</span>
                       </button>
                     </div>
                     <div className="flex items-center gap-3">
@@ -479,10 +479,10 @@ const AddLiquidityPage = () => {
                       <span className="text-sm text-gray-400">Deposit {pool.token1.symbol}</span>
                       <button
                         onClick={() => handleAmount1Change(balance1.toString())}
-                        className="text-sm text-gray-400 hover:text-amber-400 transition-colors"
+                        className="text-sm text-gray-400 hover:text-cyan-400 transition-colors"
                       >
                         Balance: {balance1.toFixed(4)}
-                        <span className="ml-1 text-amber-400">MAX</span>
+                        <span className="ml-1 text-cyan-400">MAX</span>
                       </button>
                     </div>
                     <div className="flex items-center gap-3">
@@ -527,7 +527,7 @@ const AddLiquidityPage = () => {
                     <Button
                       onClick={() => handleApprove(0)}
                       disabled={isApproving}
-                      className="w-full py-4 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 rounded-xl"
+                      className="w-full py-4 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 rounded-xl"
                     >
                       {isApproving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                       Approve {pool.token0.symbol}
@@ -538,7 +538,7 @@ const AddLiquidityPage = () => {
                     <Button
                       onClick={() => handleApprove(1)}
                       disabled={isApproving}
-                      className="w-full py-4 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 rounded-xl"
+                      className="w-full py-4 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 rounded-xl"
                     >
                       {isApproving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                       Approve {pool.token1.symbol}
@@ -558,7 +558,7 @@ const AddLiquidityPage = () => {
                       isSubmitting ||
                       submitSuccess
                     }
-                    className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl disabled:opacity-50"
+                    className="w-full py-6 text-lg font-semibold bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-amber-400 hover:to-orange-400 text-black rounded-xl disabled:opacity-50"
                   >
                     {submitSuccess ? (
                       <><Check className="w-5 h-5 mr-2" /> Liquidity Added!</>
@@ -585,7 +585,7 @@ const AddLiquidityPage = () => {
                   <Button
                     onClick={connectWallet}
                     disabled={isConnecting}
-                    className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-xl"
+                    className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-xl"
                   >
                     {isConnecting ? 'Connecting...' : 'Connect Wallet'}
                   </Button>
@@ -614,7 +614,7 @@ const AddLiquidityPage = () => {
                           onClick={() => setRemovePercent([value])}
                           className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
                             removePercent[0] === value
-                              ? 'bg-amber-500 text-black'
+                              ? 'bg-cyan-500 text-black'
                               : 'bg-white/5 text-white hover:bg-white/10'
                           }`}
                         >
@@ -648,7 +648,7 @@ const AddLiquidityPage = () => {
                   </div>
 
                   {/* Info */}
-                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                  <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/30">
                     <div className="text-sm text-amber-200">
                       Tokens will be transferred to your wallet: {address?.slice(0, 10)}...
                     </div>
