@@ -139,7 +139,7 @@ const Header = () => {
             ) : (
               <Button
                 onClick={() => setShowWalletModal(true)}
-                className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-xl gap-2"
+                className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-400 hover:to-yellow-400 text-black font-semibold rounded-xl gap-2"
               >
                 <Wallet className="w-4 h-4" />
                 <span className="hidden sm:inline">Connect Wallet</span>
