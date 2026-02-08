@@ -241,7 +241,7 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
             <div className="font-semibold text-white flex items-center gap-2">
               {token0.symbol}/{token1.symbol}
               {!hasRealData && (
-                <span className="text-xs px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">
+                <span className="text-xs px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400">
                   Simulated
                 </span>
               )}
@@ -272,7 +272,7 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
               onClick={() => setTimeframe(tf)}
               className={`px-3 py-1 text-xs rounded-lg ${
                 timeframe === tf
-                  ? 'bg-amber-500 text-black'
+                  ? 'bg-cyan-500 text-black'
                   : 'text-gray-400 hover:text-white hover:bg-white/5'
               }`}
             >
@@ -284,8 +284,8 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
 
       {/* No real data notice */}
       {!hasRealData && !loading && (
-        <div className="mb-4 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-amber-400" />
+        <div className="mb-4 p-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-cyan-400" />
           <span className="text-xs text-amber-200">
             No real trades yet. Chart shows estimated price based on token values. Make trades to see real data!
           </span>
@@ -296,7 +296,7 @@ const TradeChart = ({ token0, token1, height = 400 }) => {
       <div className="relative">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a1a]/80 z-10">
-            <Loader2 className="w-6 h-6 text-amber-400 animate-spin" />
+            <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
           </div>
         )}
         <div ref={chartContainerRef} className="w-full" />
