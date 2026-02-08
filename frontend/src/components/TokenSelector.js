@@ -188,7 +188,7 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
             />
           </div>
           {isContractAddress && (
-            <p className="text-xs text-amber-400 mt-2 flex items-center gap-1">
+            <p className="text-xs text-cyan-400 mt-2 flex items-center gap-1">
               <AlertCircle className="w-3 h-3" />
               Contract address detected - fetching token info...
             </p>
@@ -200,7 +200,7 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
           <div className="px-4 pb-3">
             {customTokenLoading && (
               <div className="flex items-center gap-2 p-3 rounded-xl bg-white/5">
-                <Loader2 className="w-5 h-5 text-amber-400 animate-spin" />
+                <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
                 <span className="text-gray-400">Fetching token info...</span>
               </div>
             )}
@@ -228,7 +228,7 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
                       Pool exists
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1 text-amber-400 text-xs">
+                    <div className="flex items-center gap-1 text-cyan-400 text-xs">
                       <AlertCircle className="w-4 h-4" />
                       No pool
                     </div>
@@ -249,7 +249,7 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
                     </p>
                     <Button
                       onClick={handleCreatePool}
-                      className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-lg gap-2"
+                      className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-amber-400 hover:to-orange-400 text-black font-semibold rounded-lg gap-2"
                     >
                       <Plus className="w-4 h-4" />
                       Create Pool for {customTokenInfo.symbol}
@@ -272,7 +272,7 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
                   disabled={excludeToken?.id === token.id}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all ${
                     selectedToken?.id === token.id
-                      ? 'bg-amber-500/20 border-amber-500/50 text-amber-400'
+                      ? 'bg-amber-500/20 border-amber-500/50 text-cyan-400'
                       : excludeToken?.id === token.id
                       ? 'bg-white/5 border-white/5 text-gray-600 cursor-not-allowed'
                       : 'bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-white/20'
@@ -291,7 +291,7 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
           <div className="p-2">
             {loading ? (
               <div className="py-8 flex justify-center">
-                <Loader2 className="w-6 h-6 text-amber-400 animate-spin" />
+                <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
               </div>
             ) : !isContractAddress && filteredTokens.length === 0 ? (
               <div className="py-8 text-center text-gray-500">
@@ -315,7 +315,7 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
                       <div className="flex items-center gap-2">
                         <span className="font-semibold">{token.symbol}</span>
                         {token.isNative && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400">
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-cyan-400">
                             Native
                           </span>
                         )}
