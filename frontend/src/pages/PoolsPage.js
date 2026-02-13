@@ -309,7 +309,10 @@ const PoolsPage = () => {
                 <p>No pools found</p>
               </div>
             ) : (
-              filteredPools.map((pool) => (
+              filteredPools.map((pool) => {
+                const displayToken0 = getDisplayToken(pool.token0);
+                const displayToken1 = getDisplayToken(pool.token1);
+                return (
                 <div
                   key={pool.id}
                   className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-white/5 transition-colors"
@@ -318,19 +321,19 @@ const PoolsPage = () => {
                   <div className="col-span-4 flex items-center gap-3">
                     <div className="flex -space-x-2">
                       <img
-                        src={pool.token0.logo}
-                        alt={pool.token0.symbol}
+                        src={displayToken0.logo}
+                        alt={displayToken0.symbol}
                         className="w-8 h-8 rounded-full border-2 border-[#1a1a1a]"
                       />
                       <img
-                        src={pool.token1.logo}
-                        alt={pool.token1.symbol}
+                        src={displayToken1.logo}
+                        alt={displayToken1.symbol}
                         className="w-8 h-8 rounded-full border-2 border-[#1a1a1a]"
                       />
                     </div>
                     <div>
                       <div className="font-semibold text-white">
-                        {pool.token0.symbol}/{pool.token1.symbol}
+                        {displayToken0.symbol}/{displayToken1.symbol}
                       </div>
                       <div className="text-xs text-gray-500">{pool.fee}% fee</div>
                     </div>
