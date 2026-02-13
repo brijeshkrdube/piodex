@@ -240,7 +240,7 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
             {customTokenLoading && (
               <div className="flex items-center gap-2 p-3 rounded-xl bg-white/5">
                 <Loader2 className="w-5 h-5 text-cyan-400 animate-spin" />
-                <span className="text-gray-400">Fetching token info...</span>
+                <span className="text-gray-400">Fetching token info from PIOGOLD network...</span>
               </div>
             )}
             
