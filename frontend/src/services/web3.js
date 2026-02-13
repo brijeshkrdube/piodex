@@ -275,11 +275,19 @@ class Web3Service {
       const provider = this.getProvider();
       const contract = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
       
-      const [name, symbol, decimals, totalSupply] = await Promise.all([
-        contract.name(),
-        contract.symbol(),
-        contract.decimals(),
-        contract.totalSupply()
+      // Add timeout for RPC calls
+      const timeout = (ms) => new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), ms)
+      );
+      
+      const [name, symbol, decimals, totalSupply] = await Promise.race([
+        Promise.all([
+          contract.name(),
+          contract.symbol(),
+          contract.decimals(),
+          contract.totalSupply()
+        ]),
+        timeout(10000) // 10 second timeout
       ]);
       
       return {
