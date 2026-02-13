@@ -373,19 +373,19 @@ const AddLiquidityPage = () => {
         <div className="flex items-center gap-4 mb-6">
           <div className="flex -space-x-2">
             <img
-              src={pool.token0.logo}
-              alt={pool.token0.symbol}
+              src={displayToken0.logo}
+              alt={displayToken0.symbol}
               className="w-10 h-10 rounded-full border-2 border-[#0d0d0d]"
             />
             <img
-              src={pool.token1.logo}
-              alt={pool.token1.symbol}
+              src={displayToken1.logo}
+              alt={displayToken1.symbol}
               className="w-10 h-10 rounded-full border-2 border-[#0d0d0d]"
             />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">
-              {pool.token0.symbol}/{pool.token1.symbol}
+              {displayToken0.symbol}/{displayToken1.symbol}
             </h1>
             <div className="flex items-center gap-2 text-sm text-gray-400">
               <span className="px-2 py-0.5 rounded bg-white/10">{pool.fee}% fee</span>
