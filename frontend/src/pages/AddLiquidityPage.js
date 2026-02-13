@@ -547,7 +547,7 @@ const AddLiquidityPage = () => {
                       className="w-full py-4 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 rounded-xl"
                     >
                       {isApproving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                      Approve {pool.token0.symbol}
+                      Approve {displayToken0.symbol}
                     </Button>
                   )}
                   
@@ -558,7 +558,7 @@ const AddLiquidityPage = () => {
                       className="w-full py-4 bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 rounded-xl"
                     >
                       {isApproving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
-                      Approve {pool.token1.symbol}
+                      Approve {displayToken1.symbol}
                     </Button>
                   )}
 
