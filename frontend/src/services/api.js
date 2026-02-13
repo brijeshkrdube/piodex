@@ -78,13 +78,25 @@ export const getPool = async (poolId) => {
 
 export const createPool = async (token0Address, token1Address, fee, creatorAddress = null, pairAddress = null) => {
   const response = await apiClient.post('/pools', {
-    token0_address: token0Address,
-    token1_address: token1Address,
+    token0_address: token0Address.toLowerCase(),
+    token1_address: token1Address.toLowerCase(),
     fee,
     amount0: 0,
     amount1: 0,
-    creator_address: creatorAddress,
-    pair_address: pairAddress
+    creator_address: creatorAddress?.toLowerCase(),
+    pair_address: pairAddress?.toLowerCase()
+  });
+  return response.data;
+};
+
+// Register an existing on-chain pool
+export const registerPool = async (token0Address, token1Address, pairAddress, creatorAddress = null, fee = 0.3) => {
+  const response = await apiClient.post('/pools/register', {
+    token0_address: token0Address.toLowerCase(),
+    token1_address: token1Address.toLowerCase(),
+    pair_address: pairAddress.toLowerCase(),
+    creator_address: creatorAddress?.toLowerCase(),
+    fee
   });
   return response.data;
 };
