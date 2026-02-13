@@ -121,6 +121,10 @@ const AddLiquidityPage = () => {
     );
   }
 
+  // Display tokens (show PIO instead of WPIO)
+  const displayToken0 = getDisplayToken(pool.token0);
+  const displayToken1 = getDisplayToken(pool.token1);
+
   const balance0 = isConnected ? getBalance(pool.token0.id) : 0;
   const balance1 = isConnected ? getBalance(pool.token1.id) : 0;
   
