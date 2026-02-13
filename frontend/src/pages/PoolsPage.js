@@ -30,6 +30,19 @@ import {
   AlertCircle
 } from 'lucide-react';
 
+// Helper to display PIO instead of WPIO
+const getDisplayToken = (token) => {
+  if (token.symbol === 'WPIO') {
+    return {
+      ...token,
+      symbol: 'PIO',
+      name: 'PIOGOLD',
+      logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=pio&backgroundColor=FFD700'
+    };
+  }
+  return token;
+};
+
 const PoolsPage = () => {
   const location = useLocation();
   const { isConnected, connectWallet, isConnecting, address } = useWallet();
