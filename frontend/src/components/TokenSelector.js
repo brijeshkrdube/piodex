@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getTokens, getPools } from '../services/api';
+import { getTokens, getPools, createToken } from '../services/api';
 import { web3Service } from '../services/web3';
 import { useWallet } from '../context/WalletContext';
 import {
