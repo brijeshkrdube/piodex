@@ -43,10 +43,11 @@ async def create_token(token_data: TokenCreate):
         if existing:
             raise HTTPException(status_code=400, detail="Token already exists")
         
-        token = Token(
-            **token_data.model_dump(),
-            address=token_data.address.lower()
-        )
+        # Get token data and normalize address to lowercase
+        token_dict = token_data.model_dump()
+        token_dict['address'] = token_dict['address'].lower()
+        
+        token = Token(**token_dict)
         await db.tokens.insert_one(token.model_dump())
         return token
     except HTTPException:
