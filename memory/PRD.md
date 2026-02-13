@@ -103,6 +103,6 @@ A decentralized exchange (DEX) clone of Uniswap, built for the PIOGOLD blockchai
 ---
 
 ## URLs
-- **Frontend:** https://pionetswap.preview.emergentagent.com
-- **API:** https://pionetswap.preview.emergentagent.com/api
+- **Frontend:** https://piogold-dex-preview.preview.emergentagent.com
+- **API:** https://piogold-dex-preview.preview.emergentagent.com/api
 - **Block Explorer:** https://pioscan.com
