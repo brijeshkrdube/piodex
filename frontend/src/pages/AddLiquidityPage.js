@@ -646,8 +646,8 @@ const AddLiquidityPage = () => {
                     <div className="text-sm text-gray-400">You will receive (estimated)</div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <img src={pool.token0.logo} alt={pool.token0.symbol} className="w-6 h-6 rounded-full" />
-                        <span className="text-white">{pool.token0.symbol}</span>
+                        <img src={displayToken0.logo} alt={displayToken0.symbol} className="w-6 h-6 rounded-full" />
+                        <span className="text-white">{displayToken0.symbol}</span>
                       </div>
                       <span className="text-white font-medium">
                         {((pool.token0Reserve || 0) * removePercent[0] / 100).toFixed(4)}
@@ -655,8 +655,8 @@ const AddLiquidityPage = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <img src={pool.token1.logo} alt={pool.token1.symbol} className="w-6 h-6 rounded-full" />
-                        <span className="text-white">{pool.token1.symbol}</span>
+                        <img src={displayToken1.logo} alt={displayToken1.symbol} className="w-6 h-6 rounded-full" />
+                        <span className="text-white">{displayToken1.symbol}</span>
                       </div>
                       <span className="text-white font-medium">
                         {((pool.token1Reserve || 0) * removePercent[0] / 100).toFixed(4)}
