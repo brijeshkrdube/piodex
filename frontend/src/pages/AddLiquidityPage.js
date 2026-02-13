@@ -21,6 +21,19 @@ import {
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 
+// Helper to display PIO instead of WPIO
+const getDisplayToken = (token) => {
+  if (token.symbol === 'WPIO') {
+    return {
+      ...token,
+      symbol: 'PIO',
+      name: 'PIOGOLD',
+      logo: 'https://api.dicebear.com/7.x/shapes/svg?seed=pio&backgroundColor=FFD700'
+    };
+  }
+  return token;
+};
+
 const AddLiquidityPage = () => {
   const { poolId } = useParams();
   const { isConnected, connectWallet, getBalance, isConnecting, address } = useWallet();
