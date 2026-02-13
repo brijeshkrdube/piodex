@@ -226,7 +226,7 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
               className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-amber-500/50"
             />
           </div>
-          {isContractAddress && (
+          {isContractAddress && !customTokenLoading && !customTokenInfo && !customTokenError && (
             <p className="text-xs text-cyan-400 mt-2 flex items-center gap-1">
               <AlertCircle className="w-3 h-3" />
               Contract address detected - fetching token info...
