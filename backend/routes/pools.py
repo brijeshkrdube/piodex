@@ -299,3 +299,81 @@ async def remove_liquidity(request: RemoveLiquidityRequest):
     except Exception as e:
         logger.error(f"Error removing liquidity: {e}")
         raise HTTPException(status_code=500, detail="Failed to remove liquidity")
+
+
+@router.post("/register", response_model=PoolResponse)
+async def register_pool(request: RegisterPoolRequest):
+    """Register an existing on-chain pool in the database"""
+    try:
+        # Normalize all addresses to lowercase
+        token0_addr = request.token0_address.lower()
+        token1_addr = request.token1_address.lower()
+        pair_addr = request.pair_address.lower()
+        creator_addr = request.creator_address.lower() if request.creator_address else None
+        
+        logger.info(f"Registering pool: {token0_addr} / {token1_addr} at {pair_addr}")
+        
+        # Check if tokens exist
+        token0 = await db.tokens.find_one({"address": token0_addr})
+        token1 = await db.tokens.find_one({"address": token1_addr})
+        
+        if not token0:
+            logger.error(f"Token0 not found: {token0_addr}")
+            raise HTTPException(status_code=400, detail=f"Token not found: {token0_addr}")
+        if not token1:
+            logger.error(f"Token1 not found: {token1_addr}")
+            raise HTTPException(status_code=400, detail=f"Token not found: {token1_addr}")
+        
+        # Check if pool already exists
+        existing = await db.pools.find_one({
+            "$or": [
+                {"token0_address": token0_addr, "token1_address": token1_addr},
+                {"token0_address": token1_addr, "token1_address": token0_addr},
+                {"pair_address": pair_addr}
+            ]
+        })
+        
+        if existing:
+            # Return existing pool instead of error
+            pool_response = await get_pool_with_tokens(existing)
+            if pool_response:
+                return pool_response
+            raise HTTPException(status_code=400, detail="Pool already exists")
+        
+        # Create pool record
+        pool = Pool(
+            id=str(uuid.uuid4()),
+            token0_address=token0_addr,
+            token1_address=token1_addr,
+            fee=request.fee,
+            tvl=0.0,
+            volume_24h=0.0,
+            apr=0.0,
+            token0_reserve=0.0,
+            token1_reserve=0.0,
+            creator_address=creator_addr,
+            pair_address=pair_addr
+        )
+        
+        await db.pools.insert_one(pool.model_dump())
+        
+        logger.info(f"Pool registered: {token0['symbol']}/{token1['symbol']} at {pair_addr}")
+        
+        return PoolResponse(
+            id=pool.id,
+            token0=Token(**token0),
+            token1=Token(**token1),
+            fee=pool.fee,
+            tvl=pool.tvl,
+            volume_24h=pool.volume_24h,
+            apr=pool.apr,
+            token0_reserve=pool.token0_reserve,
+            token1_reserve=pool.token1_reserve,
+            creator_address=pool.creator_address,
+            pair_address=pool.pair_address
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error registering pool: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to register pool: {str(e)}")
