@@ -114,9 +114,38 @@ const PoolsPage = () => {
       const existingPair = await web3Service.getPairAddress(addr0, addr1);
       
       if (existingPair && existingPair !== ethers.constants.AddressZero) {
-        // Pair already exists - don't allow creating again
+        // Pair already exists on-chain - register it in our database
         setPairAddress(existingPair);
-        alert(`This pool already exists!\n\nPair Address: ${existingPair}\n\nGo to "Add Liquidity" to add funds to this existing pool.`);
+        
+        try {
+          // Register the existing pool in our database
+          await registerPool(
+            addr0,
+            addr1,
+            existingPair,
+            address,
+            selectedFee.value
+          );
+          
+          setCreateSuccess(true);
+          
+          // Refresh pools list
+          const fetchedPools = await getPools();
+          setPools(fetchedPools);
+          
+          setTimeout(() => {
+            setShowCreatePool(false);
+            setCreateSuccess(false);
+            setToken0(null);
+            setToken1(null);
+            setTxHash(null);
+            setPairAddress(null);
+          }, 3000);
+        } catch (dbError) {
+          console.log('Pool already registered:', dbError);
+          alert(`This pool already exists!\n\nPair Address: ${existingPair}\n\nGo to "Add Liquidity" to add funds to this pool.`);
+        }
+        
         setIsCreating(false);
         return;
       }
@@ -133,18 +162,20 @@ const PoolsPage = () => {
       
       // Get the new pair address from the event
       const pairCreatedEvent = receipt.events?.find(e => e.event === 'PairCreated');
-      if (pairCreatedEvent) {
-        setPairAddress(pairCreatedEvent.args.pair);
+      const newPairAddress = pairCreatedEvent?.args?.pair;
+      
+      if (newPairAddress) {
+        setPairAddress(newPairAddress);
       }
       
-      // Also record in backend database with creator address
+      // Register the new pool in backend database
       try {
-        await createPoolAPI(
-          token0.address, 
-          token1.address, 
-          selectedFee.value,
-          address, // Creator's wallet address
-          pairCreatedEvent?.args?.pair || null // On-chain pair address
+        await registerPool(
+          addr0,
+          addr1,
+          newPairAddress || '',
+          address,
+          selectedFee.value
         );
       } catch (dbError) {
         console.log('Backend sync failed, but pool created on-chain:', dbError);
