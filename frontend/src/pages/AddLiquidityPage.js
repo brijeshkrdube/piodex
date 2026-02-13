@@ -454,7 +454,7 @@ const AddLiquidityPage = () => {
                   {/* Token 0 Input */}
                   <div className="bg-white/5 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-400">Deposit {pool.token0.symbol}</span>
+                      <span className="text-sm text-gray-400">Deposit {displayToken0.symbol}</span>
                       <button
                         onClick={() => handleAmount0Change(balance0.toString())}
                         className="text-sm text-gray-400 hover:text-cyan-400 transition-colors"
@@ -472,8 +472,8 @@ const AddLiquidityPage = () => {
                         className="flex-1 bg-transparent border-none text-2xl font-medium text-white placeholder:text-gray-600 focus-visible:ring-0 p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
                       <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10">
-                        <img src={pool.token0.logo} alt={pool.token0.symbol} className="w-6 h-6 rounded-full" />
-                        <span className="font-semibold text-white">{pool.token0.symbol}</span>
+                        <img src={displayToken0.logo} alt={displayToken0.symbol} className="w-6 h-6 rounded-full" />
+                        <span className="font-semibold text-white">{displayToken0.symbol}</span>
                       </div>
                     </div>
                     {amount0 && (
@@ -493,7 +493,7 @@ const AddLiquidityPage = () => {
                   {/* Token 1 Input */}
                   <div className="bg-white/5 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-400">Deposit {pool.token1.symbol}</span>
+                      <span className="text-sm text-gray-400">Deposit {displayToken1.symbol}</span>
                       <button
                         onClick={() => handleAmount1Change(balance1.toString())}
                         className="text-sm text-gray-400 hover:text-cyan-400 transition-colors"
@@ -511,8 +511,8 @@ const AddLiquidityPage = () => {
                         className="flex-1 bg-transparent border-none text-2xl font-medium text-white placeholder:text-gray-600 focus-visible:ring-0 p-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
                       <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10">
-                        <img src={pool.token1.logo} alt={pool.token1.symbol} className="w-6 h-6 rounded-full" />
-                        <span className="font-semibold text-white">{pool.token1.symbol}</span>
+                        <img src={displayToken1.logo} alt={displayToken1.symbol} className="w-6 h-6 rounded-full" />
+                        <span className="font-semibold text-white">{displayToken1.symbol}</span>
                       </div>
                     </div>
                     {amount1 && (
