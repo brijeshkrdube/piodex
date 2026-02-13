@@ -30,6 +30,21 @@ export const getToken = async (address) => {
   };
 };
 
+export const createToken = async (tokenData) => {
+  const response = await apiClient.post('/tokens', {
+    id: tokenData.id || `token_${tokenData.address.slice(0, 8)}`,
+    symbol: tokenData.symbol,
+    name: tokenData.name,
+    address: tokenData.address.toLowerCase(),
+    decimals: tokenData.decimals || 18,
+    logo: tokenData.logo || `https://api.dicebear.com/7.x/shapes/svg?seed=${tokenData.symbol}&backgroundColor=6366f1`,
+    price: tokenData.price || 0,
+    price_change_24h: tokenData.priceChange || 0,
+    is_native: false
+  });
+  return response.data;
+};
+
 // Pool APIs
 export const getPools = async () => {
   const response = await apiClient.get('/pools');
