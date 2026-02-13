@@ -83,13 +83,42 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
       if (tokenInfo) {
         // Generate logo and add additional fields
         const customToken = {
-          id: `custom_${address.slice(0, 8)}`,
+          id: `token_${address.slice(0, 8).toLowerCase()}`,
           ...tokenInfo,
           logo: `https://api.dicebear.com/7.x/shapes/svg?seed=${tokenInfo.symbol}&backgroundColor=6366f1`,
           price: 0,
           priceChange: 0,
           isCustom: true
         };
+
+        // Save the token to the backend database for persistence
+        try {
+          const savedToken = await createToken({
+            id: customToken.id,
+            symbol: tokenInfo.symbol,
+            name: tokenInfo.name,
+            address: tokenInfo.address,
+            decimals: tokenInfo.decimals,
+            logo: customToken.logo,
+            price: 0,
+            priceChange: 0
+          });
+          
+          // Update customToken with saved data (it may have an updated id)
+          customToken.id = savedToken.id || customToken.id;
+          
+          // Add the new token to the local tokens list so it's immediately available
+          setTokens(prevTokens => [...prevTokens, customToken]);
+          
+          toast.success(`Token ${tokenInfo.symbol} discovered and saved!`, {
+            description: `${tokenInfo.name} has been added to the token list.`
+          });
+        } catch (saveError) {
+          // Token might already exist in DB (race condition) - still show it
+          console.warn('Could not save token to database:', saveError);
+          // Don't show error toast - the token can still be used
+        }
+
         setCustomTokenInfo(customToken);
 
         // Check if pool exists for this token
@@ -99,11 +128,20 @@ const TokenSelector = ({ open, onOpenChange, onSelect, selectedToken, excludeTok
         );
         setHasPoolForCustomToken(poolExists);
       } else {
-        setCustomTokenError('Could not fetch token information. Make sure this is a valid ERC-20 token contract.');
+        setCustomTokenError('Could not fetch token information. Make sure this is a valid ERC-20 token contract on PIOGOLD network.');
+        toast.error('Token not found', {
+          description: 'The address may not be a valid ERC-20 token contract.'
+        });
       }
     } catch (error) {
       console.error('Error fetching custom token:', error);
-      setCustomTokenError('Failed to fetch token information. The address may not be a valid token contract.');
+      const errorMessage = error.message === 'Timeout' 
+        ? 'Network timeout - please check your connection and try again.'
+        : 'Failed to fetch token information. The address may not be a valid token contract.';
+      setCustomTokenError(errorMessage);
+      toast.error('Failed to fetch token', {
+        description: errorMessage
+      });
     }
     
     setCustomTokenLoading(false);
