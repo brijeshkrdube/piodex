@@ -374,7 +374,7 @@ const PoolsPage = () => {
                     </Button>
                   </div>
                 </div>
-              ))
+              );})
             )}
           </div>
         </Card>
