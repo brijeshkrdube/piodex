@@ -26,12 +26,25 @@ class RemoveLiquidityRequest(BaseModel):
     tx_hash: Optional[str] = None
 
 
+class RegisterPoolRequest(BaseModel):
+    """Register an existing on-chain pool"""
+    token0_address: str
+    token1_address: str
+    pair_address: str
+    creator_address: Optional[str] = None
+    fee: float = 0.3
+
+
 async def get_pool_with_tokens(pool: dict) -> PoolResponse:
     """Helper to get pool with token details"""
-    token0 = await db.tokens.find_one({"address": pool["token0_address"]})
-    token1 = await db.tokens.find_one({"address": pool["token1_address"]})
+    token0_addr = pool["token0_address"].lower()
+    token1_addr = pool["token1_address"].lower()
+    
+    token0 = await db.tokens.find_one({"address": token0_addr})
+    token1 = await db.tokens.find_one({"address": token1_addr})
     
     if not token0 or not token1:
+        logger.warning(f"Tokens not found for pool: {token0_addr}, {token1_addr}")
         return None
     
     return PoolResponse(
