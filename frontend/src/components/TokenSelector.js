@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getTokens, getPools, createToken } from '../services/api';
 import { web3Service } from '../services/web3';
 import { useWallet } from '../context/WalletContext';
+import { toast } from 'sonner';
 import {
   Dialog,
   DialogContent,
